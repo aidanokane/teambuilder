@@ -10,6 +10,12 @@ function App() {
       .then((data) => setMessage(data));
   }, []);
 
+  useEffect(() => {
+    fetch("/test-db")
+    .then((res) => res.text())
+    .then((data) => setMessage(data));
+  });
+
   return (<h1>{message}</h1>);
 }
 
