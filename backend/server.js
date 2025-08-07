@@ -29,6 +29,14 @@ app.use(passport.session());
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
+// team routes
+const teamRoutes = require('./routes/team');
+app.use('/api/teams', teamRoutes);
+
+// pokemon routes
+const pokemonRoutes = require('./routes/pokemon');
+app.use('/api/pokemon', pokemonRoutes);
+
 // test routes
 app.get('/test', (req, res) => {
     res.send('Backend is working');
