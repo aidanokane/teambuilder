@@ -17,14 +17,19 @@ const Popup = ({onSignIn, onSkip}) => {
 
 const Team = ({selectedTeam}) => {
     const [selectedMember, setMember] = useState(0);
-    const team = selectedTeam ?? [];
+    let team = []
+    team = (selectedTeam && selectedTeam.length > 0)
+        ? JSON.parse(JSON.parse(selectedTeam))
+        : [];
+    console.log("TEAM:");
+    console.log(team);
     return (
         <div className="Team">
             <div className="Team-Bar">
                 {[0, 1, 2, 3, 4, 5].map((index) => (
                 <button
                     key={index}
-                    className="Team-Button"
+                    className="Member-Button"
                     onClick={() => setMember(index)}
                 >
                 <div className="Team-Member">
@@ -46,6 +51,7 @@ const Team = ({selectedTeam}) => {
 }
 
 const Info = ({ pokemon }) => {
+    console.log(pokemon);
     const name = pokemon.name;
     let types = pokemon.types[0];
     if(pokemon.types[1] != "null"){
@@ -61,38 +67,38 @@ const Info = ({ pokemon }) => {
 
 function App() {
 
-    const team = [
-        {
-            "name": "Infernape",
-            "types": ["Fire", "Fighting"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/392.png"
-        },
-        {
-            "name": "Staraptor",
-            "types": ["Normal", "Flying"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/398.png"
-        },
-        {
-            "name": "Luxray",
-            "types": ["Electric", "null"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/405.png"
-        },
-        {
-            "name": "Floatzel",
-            "types": ["Water", "null"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/419.png"
-        },
-        {
-            "name": "Lucario",
-            "types": ["Fighting", "Steel"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png"
-        },
-        {
-            "name": "Roserade",
-            "types": ["Grass", "Poison"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/407.png"
-        }
-    ]
+    // const team = [
+    //     {
+    //         "name": "Infernape",
+    //         "types": ["Fire", "Fighting"],
+    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/392.png"
+    //     },
+    //     {
+    //         "name": "Staraptor",
+    //         "types": ["Normal", "Flying"],
+    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/398.png"
+    //     },
+    //     {
+    //         "name": "Luxray",
+    //         "types": ["Electric", "null"],
+    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/405.png"
+    //     },
+    //     {
+    //         "name": "Floatzel",
+    //         "types": ["Water", "null"],
+    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/419.png"
+    //     },
+    //     {
+    //         "name": "Lucario",
+    //         "types": ["Fighting", "Steel"],
+    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png"
+    //     },
+    //     {
+    //         "name": "Roserade",
+    //         "types": ["Grass", "Poison"],
+    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/407.png"
+    //     }
+    // ]
 
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState(() => {
@@ -100,6 +106,7 @@ function App() {
         // return true;
     });
     const [teams, setTeams] = useState([]);
+    const [team, setTeam] = useState([]);
 
     const closePopup = useCallback(() => {
         setMessage(false);
@@ -131,7 +138,6 @@ function App() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             setUser(data.authenticated ? data.user : null);
-            setTeams()
         } catch (e) {
         if (e.name !== "AbortError") console.error(e);
             setUser(null);
@@ -144,7 +150,7 @@ function App() {
             credentials: "include",
             signal,
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             setTeams(data)
             console.log(data);
@@ -154,13 +160,16 @@ function App() {
         }
     }, []);
 
-    const saveTeam = useCallback(async (team, {signal} = {}) => {
+    const saveTeam = useCallback(async (team) => {
         try{
             const res = await fetch('http://localhost:3001/api/teams/save', {
                 method: "POST",
                 credentials: "include",
-                body: {"name": "TEST", "team": team}
-            });
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    "name": "Default",
+                    "pokemon_data": JSON.stringify(team)
+                })});
         } catch (e) {
             if (e.name !== "AbortError") console.error(e);
         }
@@ -183,15 +192,23 @@ function App() {
         });
         return () => ctrl.abort();
         }, [fetchTeams]);
-
     return (
       <div className="App">
         <div className="navbar">Welcome {user ? user.displayName : "Guest"}</div>
         {message && <Popup onSignIn={signIn} onSkip={closePopup}/>}
         <div style={{"display": "flex", "gap": "20px"}}>
-            <Team selectedTeam={team}/>
+            <Team selectedTeam={team.pokemon_data}/>
             <div className="Team-List">
                 <h2>TEAMS</h2>
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                    <button
+                        key={index}
+                        className="Team-Button"
+                        onClick={() => {
+                            setTeam(teams[index]);
+                        }}
+                    >TEAM {index}</button>
+                ))}
             </div>
         </div>
         <div className="Debug-Bar">
@@ -200,7 +217,7 @@ function App() {
             <button onClick={signIn}>Sign in</button>
             <button onClick={signOut}>Sign out</button>
             <button onClick={openPopup}>Open Popup</button>
-            <button onClick={saveTeam}>Save Default</button>
+            <button onClick={() => saveTeam(team)}>Save Default</button>
         </div>
       </div>
   );
