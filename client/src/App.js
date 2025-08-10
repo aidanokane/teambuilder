@@ -79,38 +79,41 @@ const TeamList = ({teams, setTeam}) => {
 
 function App() {
 
-    const default_team = [
-        {
-            "name": "Infernape",
-            "types": ["Fire", "Fighting"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/392.png"
-        },
-        {
-            "name": "Staraptor",
-            "types": ["Normal", "Flying"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/398.png"
-        },
-        {
-            "name": "Luxray",
-            "types": ["Electric", "null"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/405.png"
-        },
-        {
-            "name": "Floatzel",
-            "types": ["Water", "null"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/419.png"
-        },
-        {
-            "name": "Lucario",
-            "types": ["Fighting", "Steel"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png"
-        },
-        {
-            "name": "Roserade",
-            "types": ["Grass", "Poison"],
-            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/407.png"
-        }
-    ]
+    const default_team = {
+        "name": "default",
+        "pokemon_data": [
+            {
+                "name": "Typhlosion",
+                "types": ["Fire", "null"],
+                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png"
+            },
+            {
+                "name": "Noctowl",
+                "types": ["Normal", "Flying"],
+                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/164.png"
+            },
+            {
+                "name": "Ampharos",
+                "types": ["Electric", "null"],
+                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/181.png"
+            },
+            {
+                "name": "Politoed",
+                "types": ["Water", "null"],
+                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/186.png"
+            },
+            {
+                "name": "Espeon",
+                "types": ["Psychic", "null"],
+                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/196.png"
+            },
+            {
+                "name": "Scizor",
+                "types": ["Bug", "Steel"],
+                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/212.png"
+            }
+        ]
+    }
 
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState(() => {
@@ -180,7 +183,7 @@ function App() {
                 credentials: "include",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
-                    "name": "Default",
+                    "name": team.name,
                     "pokemon_data": JSON.stringify(team.pokemon_data)
                 })});
         } catch (e) {
