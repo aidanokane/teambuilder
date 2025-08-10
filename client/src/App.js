@@ -17,10 +17,7 @@ const Popup = ({onSignIn, onSkip}) => {
 
 const Team = ({selectedTeam}) => {
     const [selectedMember, setMember] = useState(0);
-    let team = []
-    team = (selectedTeam && selectedTeam.length > 0)
-        ? JSON.parse(JSON.parse(selectedTeam))
-        : [];
+    const team = selectedTeam ?? [];
     console.log("TEAM:");
     console.log(team);
     return (
@@ -65,40 +62,55 @@ const Info = ({ pokemon }) => {
     )
 }
 
+const TeamList = ({teams, setTeam}) => {
+    console.log(teams.length);
+    return(<div className="Team-List">
+                <h2>TEAMS</h2>
+                {teams.map((team, index) => (
+                    <button
+                        key={index}
+                        onClick={() => {
+                            setTeam(team);
+                        }}
+                    >TEAM {index}: {team.name}</button>
+                ))}
+            </div>);
+}
+
 function App() {
 
-    // const team = [
-    //     {
-    //         "name": "Infernape",
-    //         "types": ["Fire", "Fighting"],
-    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/392.png"
-    //     },
-    //     {
-    //         "name": "Staraptor",
-    //         "types": ["Normal", "Flying"],
-    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/398.png"
-    //     },
-    //     {
-    //         "name": "Luxray",
-    //         "types": ["Electric", "null"],
-    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/405.png"
-    //     },
-    //     {
-    //         "name": "Floatzel",
-    //         "types": ["Water", "null"],
-    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/419.png"
-    //     },
-    //     {
-    //         "name": "Lucario",
-    //         "types": ["Fighting", "Steel"],
-    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png"
-    //     },
-    //     {
-    //         "name": "Roserade",
-    //         "types": ["Grass", "Poison"],
-    //         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/407.png"
-    //     }
-    // ]
+    const default_team = [
+        {
+            "name": "Infernape",
+            "types": ["Fire", "Fighting"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/392.png"
+        },
+        {
+            "name": "Staraptor",
+            "types": ["Normal", "Flying"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/398.png"
+        },
+        {
+            "name": "Luxray",
+            "types": ["Electric", "null"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/405.png"
+        },
+        {
+            "name": "Floatzel",
+            "types": ["Water", "null"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/419.png"
+        },
+        {
+            "name": "Lucario",
+            "types": ["Fighting", "Steel"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png"
+        },
+        {
+            "name": "Roserade",
+            "types": ["Grass", "Poison"],
+            "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/407.png"
+        }
+    ]
 
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState(() => {
@@ -153,10 +165,11 @@ function App() {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             setTeams(data)
+            console.log("TEAMS LIST");
             console.log(data);
         } catch (e) {
             if (e.name !== "AbortError") console.error(e);
-            setTeams(null);
+            setTeams([]);
         }
     }, []);
 
@@ -168,7 +181,7 @@ function App() {
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
                     "name": "Default",
-                    "pokemon_data": JSON.stringify(team)
+                    "pokemon_data": JSON.stringify(team.pokemon_data)
                 })});
         } catch (e) {
             if (e.name !== "AbortError") console.error(e);
@@ -188,28 +201,17 @@ function App() {
         const ctrl = new AbortController();
         fetchTeams({ signal: ctrl.signal }).catch(e => {
             if(e.name !== "AbortError") console.error(e);
-            setTeams(null);
+            setTeams([]);
         });
         return () => ctrl.abort();
         }, [fetchTeams]);
     return (
       <div className="App">
-        <div className="navbar">Welcome {user ? user.displayName : "Guest"}</div>
+        <div className="navbar">Welcome {user ? user.name : "Guest"}</div>
         {message && <Popup onSignIn={signIn} onSkip={closePopup}/>}
         <div style={{"display": "flex", "gap": "20px"}}>
             <Team selectedTeam={team.pokemon_data}/>
-            <div className="Team-List">
-                <h2>TEAMS</h2>
-                {[0, 1, 2, 3, 4, 5].map((index) => (
-                    <button
-                        key={index}
-                        className="Team-Button"
-                        onClick={() => {
-                            setTeam(teams[index]);
-                        }}
-                    >TEAM {index}</button>
-                ))}
-            </div>
+            <TeamList teams={teams} setTeam={setTeam}></TeamList>
         </div>
         <div className="Debug-Bar">
             <button onClick={() => fetchStatus()}>Get User Info</button>
@@ -217,7 +219,8 @@ function App() {
             <button onClick={signIn}>Sign in</button>
             <button onClick={signOut}>Sign out</button>
             <button onClick={openPopup}>Open Popup</button>
-            <button onClick={() => saveTeam(team)}>Save Default</button>
+            <button onClick={() => saveTeam(default_team)}>Save Default</button>
+            <button onClick={() => saveTeam(team)}>Save Team</button>
         </div>
       </div>
   );

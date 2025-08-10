@@ -30,7 +30,11 @@ router.get('/my-teams', isAuthenticated, async (req, res) => {
             'SELECT * FROM teams WHERE user_id = $1 ORDER BY created_at DESC',
             [req.user.id]
         );
+        result.rows.map((row) => {
+            row.pokemon_data = JSON.parse(JSON.parse(row.pokemon_data));
+        })
         res.json(result.rows);
+        console.log(res);
     } catch (err) {
         console.error('Error fetching teams:', err);
         res.status(500).json({ error: 'Failed to fetch teams' });
