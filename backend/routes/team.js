@@ -10,12 +10,12 @@ function isAuthenticated(req, res, next) {
 }
 
 router.post('/save', isAuthenticated, async (req, res) => {
-    const { name, pokemonData } = req.body;
-
+    const { name, pokemon_data } = req.body;
+    
     try {
         const result = await pool.query(
             'INSERT INTO teams (user_id, name, pokemon_data) VALUES ($1, $2, $3) RETURNING *',
-            [req.user.id, name, JSON.stringify(pokemonData)]
+            [req.user.id, name, JSON.stringify(pokemon_data)]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -30,7 +30,11 @@ router.get('/my-teams', isAuthenticated, async (req, res) => {
             'SELECT * FROM teams WHERE user_id = $1 ORDER BY created_at DESC',
             [req.user.id]
         );
+        result.rows.map((row) => {
+            row.pokemon_data = JSON.parse(JSON.parse(row.pokemon_data));
+        })
         res.json(result.rows);
+        console.log(res);
     } catch (err) {
         console.error('Error fetching teams:', err);
         res.status(500).json({ error: 'Failed to fetch teams' });
