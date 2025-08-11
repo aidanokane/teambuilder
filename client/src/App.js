@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
+
 import './App.css';
 
 const Popup = ({onSignIn, onSkip}) => {
@@ -77,6 +78,93 @@ const TeamList = ({teams, setTeam}) => {
             </div>);
 }
 
+const Search = ({team, setTeam}) => {
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState({});
+    const [err, setErr] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [selected, setSelected] = useState({})
+
+    const fetchResults = async () => {
+        setLoading(true);
+        setResults({});
+        setErr(null);
+
+
+            try {
+                const res = await fetch(`http://localhost:3001/api/pokemon/${query}`, {
+                    credentials: "include",
+                });
+
+                if (res.status === 404) {
+                    setErr("Not found");
+                    console.log(res);
+                    return;
+                }
+                if (!res.ok) {
+                    setErr(`HTTP ${res.status}`);
+                    return;
+                }
+                const data = await res.json();
+                setResults(data);
+            } catch (e) {
+                setErr(e.message || "Request failed");
+            } finally {
+                setLoading(false);
+            }
+    }
+    
+    const Result = ({pokemon}) => {
+        if(!pokemon.types) {
+            return (<div></div>);
+        }
+
+        const name = pokemon.name ?? "";
+        const sprite = pokemon.sprite ?? "";
+
+        return (<div className="SelectedInfo">
+            <img src={sprite} />
+            <h1>{name}</h1>
+            <p>{pokemon.types[1] ? pokemon.types[0].type.name + " | " + pokemon.types[1].type.name : pokemon.types[0].type.name}</p>
+            <p>
+                HP:  {pokemon.stats[0].base_stat} <br/>
+                ATT: {pokemon.stats[1].base_stat} <br/>
+                DEF: {pokemon.stats[2].base_stat} <br/>
+                SPA: {pokemon.stats[3].base_stat} <br/>
+                SPD: {pokemon.stats[4].base_stat} <br/>
+                SPE: {pokemon.stats[5].base_stat}
+            </p>
+        </div>)
+    }
+
+    return (
+        <div className="Modal-Overlay">
+            <div className="Search-Popup">
+                <h1>SEARCH</h1>
+                <input
+                value={query}
+                onChange={(e) => {
+                    setQuery(e.target.value);
+                    setSelected("")}}
+                placeholder="pokemon"
+                onKeyDown={(e) => e.key === "Enter" && fetchResults()} />
+                <button
+                    onClick={fetchResults}
+                    disabled={!query || loading}>
+                {loading ?" Searching..." : "Search"}</button>
+
+                {results.name && (<button 
+                        className="Result-Button"
+                        onClick={() => {setSelected(results)}}>
+                        <img src={results.sprites.front_default}/>
+                        {results.name}
+                    </button>)}
+                <Result pokemon={selected}/>
+            </div>
+        </div>
+    );
+}
+
 function App() {
 
     const default_team = {
@@ -118,7 +206,6 @@ function App() {
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState(() => {
         return sessionStorage.getItem("message") !== "false";
-        // return true;
     });
     const [teams, setTeams] = useState([]);
     const [team, setTeam] = useState([]);
@@ -207,7 +294,7 @@ function App() {
             setTeams([]);
         });
         return () => ctrl.abort();
-        }, [fetchTeams]);
+        }, [fetchTeams]);    
     return (
       <div className="App">
         <div className="navbar">Welcome {user ? user.name : "Guest"}</div>
@@ -215,6 +302,7 @@ function App() {
         <div style={{"display": "flex", "gap": "20px"}}>
             <Team selectedTeam={team.pokemon_data}/>
             <TeamList teams={teams} setTeam={setTeam}></TeamList>
+            <Search team={team.pokemon_data} setTeam={setTeam}></Search>
         </div>
         <div className="Debug-Bar">
             <button onClick={() => fetchStatus()}>Get User Info</button>
