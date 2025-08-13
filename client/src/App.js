@@ -141,7 +141,8 @@ const Search = ({team, setTeam}) => {
         <div className="Modal-Overlay">
             <div className="Search-Popup">
                 <h1>SEARCH</h1>
-                <input
+                <div className="Search-Filters"> 
+                    <input
                 value={query}
                 onChange={(e) => {
                     setQuery(e.target.value);
@@ -152,6 +153,7 @@ const Search = ({team, setTeam}) => {
                     onClick={fetchResults}
                     disabled={!query || loading}>
                 {loading ?" Searching..." : "Search"}</button>
+                </div>
 
                 {results.name && (<button 
                         className="Result-Button"

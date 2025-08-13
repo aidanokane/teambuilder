@@ -158,6 +158,11 @@
     height: 60vh;
     text-align: left;
     display: flex;
+    flex-direction: column;
+}
+
+.Search-Filters{
+    flex: 1;
 }
 
 .Search-Results{
