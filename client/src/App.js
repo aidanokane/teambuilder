@@ -18,7 +18,25 @@ const Popup = ({onSignIn, onSkip}) => {
 
 const Team = ({selectedTeam}) => {
     const [selectedMember, setMember] = useState(0);
-    const team = selectedTeam ?? [];
+    const team = selectedTeam ? selectedTeam.pokemon_data : [];
+
+    const Info = ({ pokemon }) => {
+        const name = pokemon.name;
+        let types = pokemon.types[0];
+        if(pokemon.types[1] != "null"){
+            types += " | " + pokemon.types[1];
+        }
+        return (
+            <div className="Info">
+                <h1>{name}</h1>
+                <p>{types}</p>
+                <button onClick={() => deleteMember(selectedMember, selectedTeam, setTeam)}>DELETE</button>
+            </div>
+        )
+    }
+
+    console.log("TEAM:");
+    console.log(team);
     return (
         <div className="Team">
             <div className="Team-Bar">
@@ -46,18 +64,12 @@ const Team = ({selectedTeam}) => {
     )
 }
 
-const Info = ({ pokemon }) => {
-    const name = pokemon.name;
-    let types = pokemon.types[0];
-    if(pokemon.types[1] != "null"){
-        types += " | " + pokemon.types[1];
-    }
-    return (
-        <div className="Info">
-            <h1>{name}</h1>
-            <p>{types}</p>
-        </div>
-    )
+function deleteMember(index, team, setTeam) {
+    setTeam(prev => {
+    const nextData = [...(prev.pokemon_data ?? [])]; // copy array
+    delete nextData[index];                           // leaves a hole
+    return { ...prev, pokemon_data: nextData };      // new object ref
+  });
 }
 
 const TeamList = ({teams, setTeam}) => {
@@ -350,7 +362,12 @@ function App() {
         return sessionStorage.getItem("message") !== "false";
     });
     const [teams, setTeams] = useState([]);
-    const [team, setTeam] = useState([]);
+    
+    const [team, setTeam] = useState({
+        name: 'Untitled',
+        pokemon_data: Array(6).fill(null)
+    });
+
     const [search, setSearch] = useState(false);
 
     const closePopup = useCallback(() => {
@@ -441,7 +458,7 @@ function App() {
         <div className="navbar">Welcome {user ? user.name : "Guest"}</div>
         {message && <Popup onSignIn={signIn} onSkip={closePopup}/>}
         <div style={{"display": "flex", "gap": "20px"}}>
-            <Team selectedTeam={team.pokemon_data}/>
+            <Team selectedTeam={team} setTeam={setTeam}/>
             <TeamList teams={teams} setTeam={setTeam}></TeamList>
             {search && (<Search team={team.pokemon_data} index={0} setSearch={setSearch}></Search>)}
         </div>
