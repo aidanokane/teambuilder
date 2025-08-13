@@ -148,6 +148,49 @@
     z-index: 1500;
 }
 
+.Search-Popup {
+    background-color: var(--color-2);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 2001;
+    width: 60vw;
+    height: 60vh;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.Search-Filters{
+    flex: 1;
+}
+
+.Search-Results{
+    flex: 1;
+}
+
+.Result-Button{
+    display: flex;
+    background-color: var(--color-4);
+    border-radius: 8px;
+    width: 200px;
+    height: 70px;
+    text-align: center;
+    color: var(--color-1);
+    justify-content: left;
+    gap: 10px;
+    align-items: center;
+}
+
+.Result-Button img{
+    width: 100px;
+    height: 100px;
+}
+
+.Selected-Info {
+    flex: 1;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
