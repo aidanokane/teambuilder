@@ -16,6 +16,10 @@ const Popup = ({onSignIn, onSkip}) => {
   );
 };
 
+function selectIndex(index){
+
+}
+
 const Team = ({selectedTeam}) => {
     const [selectedMember, setMember] = useState(0);
     const team = selectedTeam ?? [];
@@ -78,7 +82,7 @@ const TeamList = ({teams, setTeam}) => {
             </div>);
 }
 
-const Search = ({team, setTeam}) => {
+const Search = ({team, index, setSearch}) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState({});
     const [err, setErr] = useState(null);
@@ -141,7 +145,9 @@ const Search = ({team, setTeam}) => {
         <div className="Modal-Overlay">
             <div className="Search-Popup">
                 <h1>SEARCH</h1>
-                <div className="Search-Filters"> 
+                <button onClick={() => setSearch(false)}>CLOSE</button>
+                <div className="Search-Body">
+                    <div className="Search-Filters"> 
                     <input
                 value={query}
                 onChange={(e) => {
@@ -162,6 +168,7 @@ const Search = ({team, setTeam}) => {
                         {results.name}
                     </button>)}
                 <Result pokemon={selected}/>
+                </div>
             </div>
         </div>
     );
@@ -211,6 +218,7 @@ function App() {
     });
     const [teams, setTeams] = useState([]);
     const [team, setTeam] = useState([]);
+    const [search, setSearch] = useState(false);
 
     const closePopup = useCallback(() => {
         setMessage(false);
@@ -304,7 +312,7 @@ function App() {
         <div style={{"display": "flex", "gap": "20px"}}>
             <Team selectedTeam={team.pokemon_data}/>
             <TeamList teams={teams} setTeam={setTeam}></TeamList>
-            <Search team={team.pokemon_data} setTeam={setTeam}></Search>
+            {search && (<Search team={team.pokemon_data} index={0} setSearch={setSearch}></Search>)}
         </div>
         <div className="Debug-Bar">
             <button onClick={() => fetchStatus()}>Get User Info</button>
@@ -314,6 +322,7 @@ function App() {
             <button onClick={openPopup}>Open Popup</button>
             <button onClick={() => saveTeam(default_team)}>Save Default</button>
             <button onClick={() => saveTeam(team)}>Save Team</button>
+            <button onClick={() => setSearch(true)}>Search</button>
         </div>
       </div>
   );
