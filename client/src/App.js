@@ -16,15 +16,9 @@ const Popup = ({onSignIn, onSkip}) => {
   );
 };
 
-function selectIndex(index){
-
-}
-
 const Team = ({selectedTeam}) => {
     const [selectedMember, setMember] = useState(0);
     const team = selectedTeam ?? [];
-    console.log("TEAM:");
-    console.log(team);
     return (
         <div className="Team">
             <div className="Team-Bar">
@@ -39,7 +33,7 @@ const Team = ({selectedTeam}) => {
                         <img src="/pokeball.png" className="Pokeball"></img>
                     )}
                     {team[index] && (
-                        <img src={team[index].sprite} ></img>
+                        <img src={team[index].sprite} alt={team[index].name} />
                     )}
                 </div>
                 </button>
@@ -53,7 +47,6 @@ const Team = ({selectedTeam}) => {
 }
 
 const Info = ({ pokemon }) => {
-    console.log(pokemon);
     const name = pokemon.name;
     let types = pokemon.types[0];
     if(pokemon.types[1] != "null"){
@@ -68,7 +61,6 @@ const Info = ({ pokemon }) => {
 }
 
 const TeamList = ({teams, setTeam}) => {
-    console.log(teams.length);
     return(<div className="Team-List">
                 <h2>TEAMS</h2>
                 {teams.map((team, index) => (
@@ -84,95 +76,236 @@ const TeamList = ({teams, setTeam}) => {
 
 const Search = ({team, index, setSearch}) => {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState({});
-    const [err, setErr] = useState(null);
+    const [selectedGeneration, setSelectedGeneration] = useState(1);
+    const [generations, setGenerations] = useState([]);
+    const [pokemonList, setPokemonList] = useState([]);
+    const [filteredPokemon, setFilteredPokemon] = useState([]);
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [selected, setSelected] = useState({})
+    const [error, setError] = useState(null);
 
-    const fetchResults = async () => {
-        setLoading(true);
-        setResults({});
-        setErr(null);
+    useEffect(() => {
+        fetchGenerations();
+    }, []);
 
-
-            try {
-                const res = await fetch(`http://localhost:3001/api/pokemon/${query}`, {
-                    credentials: "include",
-                });
-
-                if (res.status === 404) {
-                    setErr("Not found");
-                    console.log(res);
-                    return;
-                }
-                if (!res.ok) {
-                    setErr(`HTTP ${res.status}`);
-                    return;
-                }
-                const data = await res.json();
-                setResults(data);
-            } catch (e) {
-                setErr(e.message || "Request failed");
-            } finally {
-                setLoading(false);
-            }
-    }
-    
-    const Result = ({pokemon}) => {
-        if(!pokemon.types) {
-            return (<div></div>);
+    useEffect(() => {
+        if (selectedGeneration) {
+            fetchPokemonByGeneration(selectedGeneration);
         }
+    }, [selectedGeneration]);
 
-        const name = pokemon.name ?? "";
-        const sprite = pokemon.sprite ?? "";
+    useEffect(() => {
+        if (query.trim() === '') {
+            setFilteredPokemon(pokemonList);
+        } else {
+            const filtered = pokemonList.filter(pokemon => 
+                pokemon.name.toLowerCase().includes(query.toLowerCase())
+            );
+            setFilteredPokemon(filtered);
+        }
+    }, [query, pokemonList]);
 
-        return (<div className="SelectedInfo">
-            <img src={sprite} />
-            <h1>{name}</h1>
-            <p>{pokemon.types[1] ? pokemon.types[0].type.name + " | " + pokemon.types[1].type.name : pokemon.types[0].type.name}</p>
-            <p>
-                HP:  {pokemon.stats[0].base_stat} <br/>
-                ATT: {pokemon.stats[1].base_stat} <br/>
-                DEF: {pokemon.stats[2].base_stat} <br/>
-                SPA: {pokemon.stats[3].base_stat} <br/>
-                SPD: {pokemon.stats[4].base_stat} <br/>
-                SPE: {pokemon.stats[5].base_stat}
-            </p>
-        </div>)
-    }
+    const fetchGenerations = async () => {
+        try {
+            const res = await fetch('http://localhost:3001/api/pokemon/generations', {
+                credentials: "include",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setGenerations(data);
+            }
+        } catch (e) {
+            console.error('Failed to fetch generations:', e);
+        }
+    };
+
+    const fetchPokemonByGeneration = async (generationId) => {
+        setLoading(true);
+        try {
+            const res = await fetch(`http://localhost:3001/api/pokemon/generation/${generationId}`, {
+                credentials: "include",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setPokemonList(data.pokemon);
+                setFilteredPokemon(data.pokemon);
+            }
+        } catch (e) {
+            console.error('Failed to fetch generation Pokémon:', e);
+            setError('Failed to fetch Pokémon');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchPokemonDetails = async (pokemonName) => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const res = await fetch(`http://localhost:3001/api/pokemon/${pokemonName}`, {
+                credentials: "include",
+            });
+
+            if (res.status === 404) {
+                setError("Pokémon not found");
+                return;
+            }
+            if (!res.ok) {
+                setError(`HTTP ${res.status}`);
+                return;
+            }
+            
+            const data = await res.json();
+            setSelectedPokemon(data);
+        } catch (e) {
+            setError(e.message || "Request failed");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleQueryChange = (e) => {
+        setQuery(e.target.value);
+        setSelectedPokemon(null);
+        setError(null);
+    };
+
+    const handleGenerationChange = (e) => {
+        setSelectedGeneration(parseInt(e.target.value));
+        setQuery("");
+        setSelectedPokemon(null);
+        setError(null);
+    };
+
+    const handlePokemonClick = (pokemonName) => {
+        fetchPokemonDetails(pokemonName);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    };
 
     return (
         <div className="Modal-Overlay">
             <div className="Search-Popup">
-                <h1>SEARCH</h1>
-                <button onClick={() => setSearch(false)}>CLOSE</button>
-                <div className="Search-Body">
-                    <div className="Search-Filters"> 
-                    <input
-                value={query}
-                onChange={(e) => {
-                    setQuery(e.target.value);
-                    setSelected("")}}
-                placeholder="pokemon"
-                onKeyDown={(e) => e.key === "Enter" && fetchResults()} />
-                <button
-                    onClick={fetchResults}
-                    disabled={!query || loading}>
-                {loading ?" Searching..." : "Search"}</button>
+                <div className="Search-Header">
+                    <h1>Pokemon Search</h1>
+                    <button className="Close-Button" onClick={() => setSearch(false)}>X</button>
                 </div>
+                
+                <div className="Search-Body">
+                    <div className="Search-Left">
+                        <div className="Search-Input-Section">
+                            <h3>Generation</h3>
+                            <select 
+                                className="Generation-Select"
+                                value={selectedGeneration}
+                                onChange={handleGenerationChange}
+                            >
+                                {generations.map((gen, index) => (
+                                    <option key={gen.name} value={index + 1}>
+                                        {gen.name.replace('generation-', 'Generation ').toUpperCase()}
+                                    </option>
+                                ))}
+                            </select>
+                            
+                            <h3>Search Pokémon</h3>
+                            <input
+                                className="Search-Input"
+                                value={query}
+                                onChange={handleQueryChange}
+                                onKeyDown={handleKeyDown}
+                                placeholder="Type to filter Pokémon..."
+                                autoFocus
+                            />
+                            
+                            {error && (
+                                <div className="Error-Message">
+                                    {error}
+                                </div>
+                            )}
+                        </div>
 
-                {results.name && (<button 
-                        className="Result-Button"
-                        onClick={() => {setSelected(results)}}>
-                        <img src={results.sprites.front_default}/>
-                        {results.name}
-                    </button>)}
-                <Result pokemon={selected}/>
+                        <div className="Pokemon-Grid-Section">
+                            <h3>Pokémon ({filteredPokemon.length})</h3>
+                            {loading ? (
+                                <div className="Loading-Message">Loading...</div>
+                            ) : (
+                                <div className="Pokemon-Grid">
+                                    {filteredPokemon.map((pokemon, index) => (
+                                        <button
+                                            key={index}
+                                            className="Pokemon-Grid-Item"
+                                            onClick={() => handlePokemonClick(pokemon.name)}
+                                            title={`${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)} (#${pokemon.pokedexNumber})`}
+                                        >
+                                            <img 
+                                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokedexNumber}.png`}
+                                                alt={pokemon.name}
+                                                className="Pokemon-Grid-Sprite"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="Search-Right">
+                        {selectedPokemon ? (
+                            <div className="Pokemon-Details">
+                                <div className="Pokemon-Header">
+                                    <img 
+                                        src={selectedPokemon.sprites.front_default} 
+                                        alt={selectedPokemon.name}
+                                        className="Pokemon-Sprite"
+                                    />
+                                    <div className="Pokemon-Info">
+                                        <h2>{selectedPokemon.name.charAt(0).toUpperCase() + selectedPokemon.name.slice(1)}</h2>
+                                        <div className="Pokemon-Types">
+                                            {selectedPokemon.types.map((type, index) => (
+                                                <span key={index} className={`Type-Badge Type-${type.toLowerCase()}`}>
+                                                    {type}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="Pokemon-Stats">
+                                    <h3>Base Stats</h3>
+                                    <div className="Stats-Grid">
+                                        {selectedPokemon.stats.map((stat, index) => (
+                                            <div key={index} className="Stat-Item">
+                                                <span className="Stat-Name">{stat.name.toUpperCase()}</span>
+                                                <span className="Stat-Value">{stat.base_stat}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="Pokemon-Actions">
+                                    <p className="Team-Note">
+                                        Add button will be implemented here
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="Search-Placeholder">
+                                <div className="Placeholder-Icon">Search</div>
+                                <h3>Select a Pokemon</h3>
+                                <p>Choose a generation and click on a Pokemon sprite to view details</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
-}
+};
 
 function App() {
 
@@ -265,8 +398,6 @@ function App() {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             setTeams(data)
-            console.log("TEAMS LIST");
-            console.log(data);
         } catch (e) {
             if (e.name !== "AbortError") console.error(e);
             setTeams([]);
