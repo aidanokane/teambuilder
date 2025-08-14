@@ -111,6 +111,17 @@
     padding: 0px;
 }
 
+.Team-Note {
+    text-align: center;
+    color: var(--color-4);
+    font-style: italic;
+    margin: 0;
+    padding: 15px;
+    background-color: var(--color-1);
+    border-radius: 8px;
+    border: 2px dashed var(--color-3);
+}
+
 .Team-List {
     width: 24vw;
     background-color: var(--color-3);
@@ -150,85 +161,281 @@
 
 .Search-Popup {
     background-color: var(--color-2);
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 4px;
+    border: 2px solid var(--color-3);
     z-index: 2001;
-    width: 60vw;
-    height: 60vh;
+    width: 90vw;
+    height: 80vh;
     text-align: left;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+}
+
+.Search-Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-3);
+}
+
+.Search-Header h1 {
+    margin: 0;
+    color: black;
+    font-size: 1.5rem;
+}
+
+.Close-Button {
+    background: var(--color-3);
+    border: 1px solid var(--color-4);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.Close-Button:hover {
+    background-color: var(--color-4);
 }
 
 .Search-Body {
     display: grid;
-    grid-template-columns: 280px 1fr 1fr; /* filters | results | selected */
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
-    align-items: flex-start;        
+    height: 100%;
+    overflow: hidden;
 }
 
-.Search-Filters{
-    flex: 1;
-}
-
-.Search-Results{
-    flex: 1;
-}
-
-.Result-Button{
+.Search-Left {
     display: flex;
-    background-color: var(--color-4);
-    border-radius: 8px;
-    width: 200px;
-    height: 70px;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+.Search-Input-Section h3,
+.Pokemon-Grid-Section h3 {
+    margin: 0 0 10px 0;
+    color: black;
+    font-size: 1rem;
+}
+
+.Generation-Select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-3);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    margin-bottom: 15px;
+}
+
+.Search-Input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-3);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    margin-bottom: 15px;
+}
+
+.Error-Message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #c62828;
+    font-size: 0.9rem;
+}
+
+.Loading-Message {
     text-align: center;
-    color: var(--color-1);
-    justify-content: left;
-    gap: 10px;
+    color: black;
+    padding: 20px;
+}
+
+.Pokemon-Grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid var(--color-2);
+}
+
+.Pokemon-Grid-Item {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
     align-items: center;
+    justify-content: center;
 }
 
-.Result-Button img{
-    width: 100px;
-    height: 100px;
+.Pokemon-Grid-Item:hover {
+    border-color: var(--color-3);
+    background-color: var(--color-1);
 }
 
-.Selected-Info {
-    flex: 1;
+.Pokemon-Grid-Sprite {
+    width: 70px;
+    height: 70px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Search-Right {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.Pokemon-Details {
+    background-color: white;
+    border-radius: 4px;
+    padding: 15px;
+    border: 1px solid var(--color-2);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.Pokemon-Header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-2);
 }
 
-.App-link {
-  color: #61dafb;
+.Pokemon-Sprite {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    background-color: var(--color-1);
+    padding: 5px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Pokemon-Info h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.3rem;
+    color: black;
+}
+
+.Pokemon-Types {
+    display: flex;
+    gap: 8px;
+}
+
+.Type-Badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.Type-normal { background-color: #A8A878; }
+.Type-fire { background-color: #F08030; }
+.Type-water { background-color: #6890F0; }
+.Type-electric { background-color: #F8D030; }
+.Type-grass { background-color: #78C850; }
+.Type-ice { background-color: #98D8D8; }
+.Type-fighting { background-color: #C03028; }
+.Type-poison { background-color: #A040A0; }
+.Type-ground { background-color: #E0C068; }
+.Type-flying { background-color: #A890F0; }
+.Type-psychic { background-color: #F85888; }
+.Type-bug { background-color: #A8B820; }
+.Type-rock { background-color: #B8A038; }
+.Type-ghost { background-color: #705898; }
+.Type-dragon { background-color: #7038F8; }
+.Type-dark { background-color: #705848; }
+.Type-steel { background-color: #B8B8D0; }
+.Type-fairy { background-color: #EE99AC; }
+
+.Pokemon-Stats h3 {
+    margin: 0 0 10px 0;
+    color: black;
+    font-size: 1.1rem;
+}
+
+.Stats-Grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.Stat-Item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background-color: var(--color-1);
+    border-radius: 4px;
+    border-left: 2px solid var(--color-3);
+}
+
+.Stat-Name {
+    font-weight: 600;
+    color: black;
+    font-size: 0.8rem;
+}
+
+.Stat-Value {
+    font-weight: 700;
+    color: black;
+    font-size: 0.9rem;
+}
+
+.Pokemon-Actions {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-2);
+}
+
+.Team-Note {
+    text-align: center;
+    color: black;
+    margin: 0;
+    padding: 10px;
+    background-color: var(--color-1);
+    border-radius: 4px;
+    border: 1px solid var(--color-3);
+    font-size: 0.9rem;
+}
+
+.Search-Placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: black;
+}
+
+.Placeholder-Icon {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.Search-Placeholder h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+}
+
+.Search-Placeholder p {
+    margin: 0;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    line-height: 1.3;
 }
