@@ -33,7 +33,7 @@ router.get('/my-teams', isAuthenticated, async (req, res) => {
 
         const teams = result.rows.map((row) => ({
             ...row,
-            pokemon_data: JSON.parse(row.pokemon_data)
+            pokemon_data: JSON.parse(JSON.parse(row.pokemon_data))
         }));
         
         res.json(teams);

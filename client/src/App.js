@@ -16,8 +16,7 @@ const Popup = ({onSignIn, onSkip}) => {
   );
 };
 
-const Team = ({selectedTeam}) => {
-    const [selectedMember, setMember] = useState(0);
+const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
     const team = selectedTeam ? selectedTeam.pokemon_data : [];
 
     const Info = ({ pokemon }) => {
@@ -30,10 +29,15 @@ const Team = ({selectedTeam}) => {
             <div className="Info">
                 <h1>{name}</h1>
                 <p>{types}</p>
-                <button onClick={() => deleteMember(selectedMember, selectedTeam, setTeam)}>DELETE</button>
+                <button onClick={() => deleteMember(selectedMember, setTeam)}>DELETE</button>
             </div>
         )
     }
+
+    const handleSlotClick = (index) => {
+        setMember(index);
+        if (!team[index]) setSearch(true); // open search if empty
+    };
 
     console.log("TEAM:");
     console.log(team);
@@ -44,7 +48,7 @@ const Team = ({selectedTeam}) => {
                 <button
                     key={index}
                     className="Member-Button"
-                    onClick={() => setMember(index)}
+                    onClick={() => handleSlotClick(index)}
                 >
                 <div className="Team-Member">
                     {selectedMember === index && (
@@ -64,11 +68,26 @@ const Team = ({selectedTeam}) => {
     )
 }
 
-function deleteMember(index, team, setTeam) {
+function deleteMember(index, setTeam) {
     setTeam(prev => {
-    const nextData = [...(prev.pokemon_data ?? [])]; // copy array
-    delete nextData[index];                           // leaves a hole
-    return { ...prev, pokemon_data: nextData };      // new object ref
+    const nextData = [...(prev.pokemon_data ?? [])];
+    delete nextData[index];
+    return { ...prev, pokemon_data: nextData };
+  });
+}
+
+function addMember(index, data, setTeam, setSearch) {
+    console.log(data.name);
+    console.log(index);
+    setTeam(prev => {
+    const nextData = [...(prev.pokemon_data ?? [])];
+    nextData[index] = {
+        "name": data.name,
+        "types": data.types ? [data.types[0], data.types[1]] : ["null", "null"],
+        "sprite": data.sprites.front_default
+    }
+    setSearch(false);
+    return { ...prev, pokemon_data: nextData };
   });
 }
 
@@ -86,7 +105,7 @@ const TeamList = ({teams, setTeam}) => {
             </div>);
 }
 
-const Search = ({team, index, setSearch}) => {
+const Search = ({setTeam, selectedIndex, setSearch}) => {
     const [query, setQuery] = useState("");
     const [selectedGeneration, setSelectedGeneration] = useState(1);
     const [generations, setGenerations] = useState([]);
@@ -199,6 +218,7 @@ const Search = ({team, index, setSearch}) => {
             e.preventDefault();
         }
     };
+    console.log(selectedIndex);
 
     return (
         <div className="Modal-Overlay">
@@ -301,7 +321,7 @@ const Search = ({team, index, setSearch}) => {
 
                                 <div className="Pokemon-Actions">
                                     <p className="Team-Note">
-                                        Add button will be implemented here
+                                        <button onClick={() => addMember(selectedIndex, selectedPokemon, setTeam, setSearch)}>ADD</button>
                                     </p>
                                 </div>
                             </div>
@@ -362,12 +382,11 @@ function App() {
         return sessionStorage.getItem("message") !== "false";
     });
     const [teams, setTeams] = useState([]);
-    
     const [team, setTeam] = useState({
         name: 'Untitled',
         pokemon_data: Array(6).fill(null)
     });
-
+    const [selectedMember, setMember] = useState(0);
     const [search, setSearch] = useState(false);
 
     const closePopup = useCallback(() => {
@@ -458,9 +477,9 @@ function App() {
         <div className="navbar">Welcome {user ? user.name : "Guest"}</div>
         {message && <Popup onSignIn={signIn} onSkip={closePopup}/>}
         <div style={{"display": "flex", "gap": "20px"}}>
-            <Team selectedTeam={team} setTeam={setTeam}/>
+            <Team selectedTeam={team} setTeam={setTeam} selectedMember={selectedMember} setMember={setMember} setSearch={setSearch}/>
             <TeamList teams={teams} setTeam={setTeam}></TeamList>
-            {search && (<Search team={team.pokemon_data} index={0} setSearch={setSearch}></Search>)}
+            {search && (<Search setTeam={setTeam} selectedIndex={selectedMember} setSearch={setSearch}></Search>)}
         </div>
         <div className="Debug-Bar">
             <button onClick={() => fetchStatus()}>Get User Info</button>
