@@ -39,8 +39,14 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
         if (!team[index]) setSearch(true); // open search if empty
     };
 
-    console.log("TEAM:");
-    console.log(team);
+    function deleteMember() {
+        setTeam(prev => {
+            const nextData = [...(prev.pokemon_data ?? [])];
+                delete nextData[selectedMember];
+                return { ...prev, pokemon_data: nextData };
+            });
+    }
+
     return (
         <div className="Team">
             <div className="Team-Bar">
