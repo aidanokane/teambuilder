@@ -20,14 +20,25 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
     const team = selectedTeam ? selectedTeam.pokemon_data : [];
 
     const Info = ({ pokemon }) => {
+        //static pokemon info
+        const id = pokemon.id;
         const name = pokemon.name;
+        const stats = pokemon.stats;
         let types = pokemon.types[0];
         if(pokemon.types[1] != "null"){
             types += " | " + pokemon.types[1];
         }
+
+        //dynamic pokemon info
+        const [selectedAbility, setAbility] = useState({});
+        const [moves, setMoves] = useState([{}, {}, {}, {}]);
+        const [gender, setGender] = useState("male");
+        const [shiny, setShiny] = useState(false);
+        const [heldItem, setHeldItem] = useState({});
+
         return (
             <div className="Info">
-                <h1>{name}</h1>
+                <h1>{name} ({id})</h1>
                 <p>{types}</p>
                 <button onClick={() => deleteMember(selectedMember, setTeam)}>DELETE</button>
             </div>
@@ -74,13 +85,19 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
     )
 }
 
-function deleteMember(index, setTeam) {
-    setTeam(prev => {
-    const nextData = [...(prev.pokemon_data ?? [])];
-    delete nextData[index];
-    return { ...prev, pokemon_data: nextData };
-  });
-}
+/*
+    Sample Team Member JSON
+    id: 0
+    name: ""
+    types: [{type1}, {type2}]
+    ability: {ability}
+    stats: [{hp}, {att}, ... {spe}]
+    sprite: ""
+    held_item: {held_item}
+    moves: [{move1}, {move2}...]
+    gender: ""
+    shiny: 0
+*/
 
 function addMember(index, data, setTeam, setSearch) {
     console.log(data.name);
@@ -88,9 +105,16 @@ function addMember(index, data, setTeam, setSearch) {
     setTeam(prev => {
     const nextData = [...(prev.pokemon_data ?? [])];
     nextData[index] = {
+        "id": data.id,
         "name": data.name,
-        "types": data.types ? [data.types[0], data.types[1]] : ["null", "null"],
-        "sprite": data.sprites.front_default
+        "types": data.types,
+        "stats": data.stats,
+        "sprite": data.sprites.front_default,
+        "held_item": {},
+        "ability": {},
+        "moves": [{}, {}, {}, {}],
+        "gender": "male",
+        "shiny": false
     }
     setSearch(false);
     return { ...prev, pokemon_data: nextData };
