@@ -94,13 +94,18 @@ function App() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     "name": team.name,
-                    "pokemon_data": JSON.stringify(team.pokemon_data)
+                    "pokemon_data": team.pokemon_data
                 })
             });
+            
+            if (res.ok) {
+                // Refresh teams list after saving
+                fetchTeams();
+            }
         } catch (e) {
             if (e.name !== "AbortError") console.error(e);
         }
-    }, []);
+    }, [fetchTeams]);
 
     useEffect(() => {
         const ctrl = new AbortController();
