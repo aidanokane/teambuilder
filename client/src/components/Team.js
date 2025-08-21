@@ -136,7 +136,7 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch }) =
         const getSprite = (gender, shiny) => {
             const sprite =
                 shiny ? (gender === "female"
-                        ? (apiData?.sprites?.front_female_shiny || apiData?.sprites?.front_default_shiny)
+                        ? (apiData?.sprites?.front_female_shiny || apiData?.sprites?.front_shiny)
                         : apiData?.sprites?.front_shiny)
                         : (gender === "female"
                         ? (apiData?.sprites?.front_female || apiData?.sprites?.front_default)

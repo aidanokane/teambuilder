@@ -65,6 +65,7 @@
 .Team {
     margin: 60px;
     width: 76vw;
+    text-align: left;
 }
 
 .Team-Bar {
