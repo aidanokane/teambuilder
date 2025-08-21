@@ -2,25 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import Popup from './components/Popup';
 import Team from './components/Team';
 import Search from './components/Search';
+import Teams from './components/Teams';
 import './styles/index.css';
 
-const TeamList = ({ teams, setTeam }) => {
-    return (
-        <div className="Team-List">
-            <h2>TEAMS</h2>
-            {teams.map((team, index) => (
-                <button
-                    key={index}
-                    onClick={() => {
-                        setTeam(team);
-                    }}
-                >
-                    TEAM {index}: {team.name}
-                </button>
-            ))}
-        </div>
-    );
-};
+// TeamList component removed - replaced with Teams component
 
 function App() {
     const [user, setUser] = useState(null);
@@ -129,7 +114,10 @@ function App() {
         <div className="App">
             <div className="navbar">Welcome {user ? user.name : "Guest"}</div>
             {message && <Popup onSignIn={signIn} onSkip={closePopup} />}
-            <div style={{ "display": "flex", "gap": "20px" }}>
+            <div style={{ 
+                "display": "flex", 
+                "gap": "20px"
+            }}>
                 <Team 
                     selectedTeam={team} 
                     setTeam={setTeam} 
@@ -137,7 +125,13 @@ function App() {
                     setMember={setMember} 
                     setSearch={setSearch} 
                 />
-                <TeamList teams={teams} setTeam={setTeam} />
+                <Teams 
+                    teams={teams} 
+                    setTeam={setTeam}
+                    onTeamSelect={(selectedTeam) => setTeam(selectedTeam)}
+                    onTeamDelete={(teamId) => console.log('Delete team:', teamId)}
+                    onTeamEdit={(team) => console.log('Edit team:', team)}
+                />
                 {search && (
                     <Search 
                         setTeam={setTeam} 

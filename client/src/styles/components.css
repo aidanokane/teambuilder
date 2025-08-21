@@ -39,8 +39,247 @@
    TEAM COMPONENTS
    ============================================================================ */
 .Team {
-  margin: 60px;
+  margin: 80px 60px 20px 60px; /* Just start below the navbar */
   width: 76vw;
+}
+
+/* ============================================================================
+   TEAMS MANAGEMENT COMPONENT
+   ============================================================================ */
+.Teams-Section {
+  width: 24vw;
+  background-color: var(--color-3);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 80px; /* Just start below the navbar */
+}
+
+.Teams-Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--color-2);
+}
+
+.Teams-Header h2 {
+  margin: 0;
+  color: var(--color-1);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.Create-Team-Button {
+  background-color: var(--color-4);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Create-Team-Button:hover {
+  background-color: var(--color-1);
+}
+
+.Team-Form-Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.Team-Form {
+  background-color: var(--color-2);
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+}
+
+.Team-Form h3 {
+  margin: 0 0 20px 0;
+  color: var(--color-1);
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.Team-Name-Input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--color-3);
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.Team-Name-Input:focus {
+  outline: none;
+  border-color: var(--color-4);
+}
+
+.Form-Actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.Save-Button {
+  background-color: var(--color-4);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Save-Button:hover:not(:disabled) {
+  background-color: var(--color-1);
+}
+
+.Save-Button:disabled {
+  background-color: var(--color-3);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.Cancel-Button {
+  background-color: var(--color-3);
+  color: var(--color-1);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Cancel-Button:hover {
+  background-color: var(--color-2);
+}
+
+.Teams-List {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.No-Teams {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-1);
+  font-style: italic;
+}
+
+.No-Teams p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.Team-Item {
+  background-color: var(--color-2);
+  border-radius: 8px;
+  padding: 15px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.Team-Item:hover {
+  border-color: var(--color-4);
+  transform: translateY(-2px);
+}
+
+.Team-Item.selected {
+  border-color: var(--color-4);
+  background-color: var(--color-1);
+}
+
+.Team-Info h4 {
+  margin: 0 0 8px 0;
+  color: var(--color-1);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.Team-Date {
+  margin: 0 0 5px 0;
+  color: var(--color-3);
+  font-size: 0.85rem;
+}
+
+.Team-Pokemon-Count {
+  margin: 0;
+  color: var(--color-4);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.Team-Actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.Select-Team-Button {
+  background-color: var(--color-4);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Select-Team-Button:hover {
+  background-color: var(--color-1);
+}
+
+.Edit-Team-Button {
+  background-color: var(--color-3);
+  color: var(--color-1);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Edit-Team-Button:hover {
+  background-color: var(--color-2);
+}
+
+.Delete-Team-Button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Delete-Team-Button:hover {
+  background-color: #c0392b;
 }
 
 .Team-Bar {
