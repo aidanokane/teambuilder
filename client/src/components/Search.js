@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { addMember } from "../utils/teamUtils";
 
-const Search = ({ setTeam, selectedIndex, setSearch }) => {
+const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
     const [query, setQuery] = useState("");
-    const [selectedGeneration, setSelectedGeneration] = useState(1);
     const [generations, setGenerations] = useState([]);
     const [pokemonList, setPokemonList] = useState([]);
     const [filteredPokemon, setFilteredPokemon] = useState([]);
@@ -47,16 +46,27 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
     };
 
     const fetchPokemonByGeneration = async (generationId) => {
+        const gen = parseInt(generationId);
+        if (gen <= 0) return;
+
+        const ids = Array.from({ length: gen }, (_, i) => i + 1);
+
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:3001/api/pokemon/generation/${generationId}`, {
-                credentials: "include",
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setPokemonList(data.pokemon);
-                setFilteredPokemon(data.pokemon);
-            }
+            const responses = await Promise.all(
+                ids.map(id => fetch(`http://localhost:3001/api/pokemon/generation/${id}`, {
+                    credentials: "include",
+            })));
+
+            const payloads = await Promise.all(
+                responses.map(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+            }));
+
+            const merged = payloads.flatMap(p => p.pokemon);
+            setPokemonList(merged)
+            setFilteredPokemon(merged)
         } catch (e) {
             console.error('Failed to fetch generation Pokémon:', e);
             setError('Failed to fetch Pokémon');
@@ -98,13 +108,6 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
         setError(null);
     };
 
-    const handleGenerationChange = (e) => {
-        setSelectedGeneration(parseInt(e.target.value));
-        setQuery("");
-        setSelectedPokemon(null);
-        setError(null);
-    };
-
     const handlePokemonClick = (pokemonName) => {
         fetchPokemonDetails(pokemonName);
     };
@@ -138,7 +141,6 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                             <select
                                 className="Generation-Select"
                                 value={selectedGeneration}
-                                onChange={handleGenerationChange}
                             >
                                 {generations.map((gen, index) => (
                                     <option key={gen.name} value={index + 1}>

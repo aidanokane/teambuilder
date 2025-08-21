@@ -19,6 +19,7 @@ function App() {
     const [search, setSearch] = useState(false);
     const [loadedTeamName, setLoadedTeamName] = useState(null);
     const [isTeamLoaded, setIsTeamLoaded] = useState(false);
+    const [selectedGeneration, setSelectedGeneration] = useState(2);
 
     const closePopup = useCallback(() => {
         setMessage(false);
@@ -332,10 +333,11 @@ function App() {
                 </div>
 
                 {search && (
-                    <Search
-                        setTeam={setTeam}
-                        selectedIndex={selectedMember}
-                        setSearch={setSearch}
+                    <Search 
+                        setTeam={setTeam} 
+                        selectedIndex={selectedMember} 
+                        setSearch={setSearch} 
+                        selectedGeneration={selectedGeneration}
                     />
                 )}
             </div>
