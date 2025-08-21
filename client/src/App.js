@@ -21,6 +21,7 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
 
     const Info = ({ pokemon }) => {
         const [pokemonInfo, setPokemonInfo] = useState(pokemon);
+        const [selectedMove, setSelectedMove] = useState(-1);
         const [apiData, setData] = useState({});
         const [error, setError] = useState(null);
         //get the pokemon from pokeapi again
@@ -100,6 +101,37 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
             );
         }
 
+        function MovesMenu() {
+            function setMove(index){
+                if(selectedMove === -1){
+                    return;
+                }
+
+                const moves = pokemonInfo.moves;
+                moves[selectedMove] = apiData.moves[index];
+                const newData = {...pokemonInfo, moves}
+                saveChanges(newData);
+            }
+            return (
+                <div className="moves-menu">
+                    <div>
+                        {pokemonInfo.moves?.map((item, index) => (
+                        <button key={index} onClick={() => setSelectedMove(index)}>Move {index}: {item.move?.name}</button>
+                    ))}
+                    <button onClick={() => setMove(0)}>SET MOVE TO 0</button>
+                    </div>
+                    
+                    
+                    <div className="moves-container">
+                        {apiData.moves?.map((item, index) => (
+                            <button key={index} onClick={() => setMove(index)}>{item.move.name}</button>
+                        ))}
+                    </div>
+                </div>
+                
+            );
+        }
+
         const getSprite = (gender, shiny) => {
             const sprite =
                 shiny ? (gender === "female"
@@ -114,7 +146,6 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
         function setGender(gender) {    
             const sprite = getSprite(gender, pokemonInfo.shiny);
             const nextPokemon = { ...pokemonInfo, gender, sprite };
-            setPokemonInfo(nextPokemon);
             saveChanges(nextPokemon);
         }
 
@@ -122,7 +153,6 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
             const shiny = !pokemonInfo.shiny;
             const sprite = getSprite(pokemonInfo.gender, shiny);
             const nextPokemon = { ...pokemonInfo, shiny, sprite };
-            setPokemonInfo(nextPokemon);
             saveChanges(nextPokemon);
         }
 
@@ -134,7 +164,7 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
                 console.log(next_data);
                 return { ...prev, pokemon_data: next_data};
             });
-            
+            setPokemonInfo(nextPokemon);
         }
 
         return (
@@ -142,7 +172,7 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
                 <h1>{pokemonInfo.name} ({pokemonInfo.id})</h1>
                 <p>{pokemonInfo.types.join(" | ")}</p>
                 <p>ABILITY: {pokemonInfo?.ability.ability?.name}</p>
-                <AbilityMenu></AbilityMenu>
+                <AbilityMenu/>
                 <p>GENDER: {pokemonInfo.gender}</p>
                 <div>
                     <button onClick={() => setGender("male")}>M</button>
@@ -151,6 +181,7 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
                 <p>SPRITE: {pokemonInfo.sprite}</p>
                 <p>SHINY: {pokemonInfo.shiny ? "y" : "n"}</p>
                 <button onClick={() => setShiny(true)}>SHINY</button>
+                <MovesMenu/>
                 <button onClick={() => deleteMember()}>DELETE</button>
             </div>
         )

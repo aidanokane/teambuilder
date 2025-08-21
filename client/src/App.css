@@ -8,12 +8,10 @@
 .App {
   text-align: center;
   background-color: var(--color-1);
-  height: 100vh;
   width: 100vw;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  position:fixed;
 }
 
 .navbar {
@@ -438,4 +436,28 @@
     font-size: 0.8rem;
     opacity: 0.7;
     line-height: 1.3;
+}
+
+.moves-container {
+  width: 200px;        /* fixed width, adjust as needed */
+  height: 300px;       /* fixed height, adjust as needed */
+  overflow-y: auto;    /* scroll vertically if too many buttons */
+  overflow-x: hidden;  /* prevent horizontal scrolling */
+  display: flex;
+  flex-direction: column;
+}
+
+.moves-container button {
+  width: 100%;         /* one button per row */
+  padding: 8px;
+  margin: 2px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background-color: var(--color-2);
+  text-align: left;
+  cursor: pointer;
+}
+
+.moves-menu {
+    display: flex;
 }

@@ -107,7 +107,8 @@ router.get('/:name', async (req, res) => {
             },
             height: data.height,
             weight: data.weight,
-            abilities: data.abilities
+            abilities: data.abilities,
+            moves: data.moves
         };
         
         res.json(formattedPokemon);
