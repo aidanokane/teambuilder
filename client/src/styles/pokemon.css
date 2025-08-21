@@ -1,0 +1,87 @@
+/* ============================================================================
+   POKEMON TYPE BADGES
+   ============================================================================ */
+.Type-normal { background-color: #A8A878; }
+.Type-fire { background-color: #F08030; }
+.Type-water { background-color: #6890F0; }
+.Type-electric { background-color: #F8D030; }
+.Type-grass { background-color: #78C850; }
+.Type-ice { background-color: #98D8D8; }
+.Type-fighting { background-color: #C03028; }
+.Type-poison { background-color: #A040A0; }
+.Type-ground { background-color: #E0C068; }
+.Type-flying { background-color: #A890F0; }
+.Type-psychic { background-color: #F85888; }
+.Type-bug { background-color: #A8B820; }
+.Type-rock { background-color: #B8A038; }
+.Type-ghost { background-color: #705898; }
+.Type-dragon { background-color: #7038F8; }
+.Type-dark { background-color: #705848; }
+.Type-steel { background-color: #B8B8D0; }
+.Type-fairy { background-color: #EE99AC; }
+
+/* ============================================================================
+   MOVES MENU
+   ============================================================================ */
+.moves-container {
+  width: 200px;
+  height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.moves-container button {
+  width: 100%;
+  padding: 8px;
+  margin: 2px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background-color: var(--color-2);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.moves-container button:hover {
+  background-color: var(--color-3);
+  transform: translateX(2px);
+}
+
+.moves-menu {
+  display: flex;
+  gap: 20px;
+}
+
+.moves-menu button {
+  border: none;
+  background-color: var(--color-2);
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.moves-menu button:hover {
+  background-color: var(--color-3);
+}
+
+/* ============================================================================
+   DROPDOWN STYLES
+   ============================================================================ */
+.dropdown select {
+  padding: 8px;
+  border: 1px solid var(--color-3);
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.dropdown select:focus {
+  outline: none;
+  border-color: var(--color-4);
+  box-shadow: 0 0 0 2px rgba(162, 170, 219, 0.2);
+}

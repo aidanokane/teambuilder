@@ -1,0 +1,8 @@
+/* ============================================================================
+   TEAMBUILDER STYLES - MAIN INDEX
+   ============================================================================ */
+
+/* Import all organized style files */
+@import './base.css';
+@import './components.css';
+@import './pokemon.css';
