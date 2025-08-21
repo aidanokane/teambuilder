@@ -20,16 +20,169 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
     const team = selectedTeam ? selectedTeam.pokemon_data : [];
 
     const Info = ({ pokemon }) => {
-        const name = pokemon.name;
-        let types = pokemon.types[0];
-        if(pokemon.types[1] != "null"){
-            types += " | " + pokemon.types[1];
+        const [pokemonInfo, setPokemonInfo] = useState(pokemon);
+        const [selectedMove, setSelectedMove] = useState(-1);
+        const [apiData, setData] = useState({});
+        const [error, setError] = useState(null);
+        //get the pokemon from pokeapi again
+        
+        //get all possible 
+        useEffect(() => {
+            if (!pokemon?.name) {
+                setData({});
+                setError(null);
+                return;
+            }
+            console.log(pokemon.name)
+            const ctrl = new AbortController();
+            const run = async () => {
+                try {
+                setError(null);
+                const name = pokemon.name.trim().toLowerCase();
+                const res = await fetch(`http://localhost:3001/api/pokemon/${name}`, {
+                    credentials: "include",
+                    signal: ctrl.signal,
+                });
+
+                if (res.status === 404) {
+                    setData({});
+                    setError("Pokémon not found");
+                    return;
+                }
+                if (!res.ok) {
+                    setData({});
+                    setError(`HTTP ${res.status}`);
+                    return;
+                }
+
+                const json = await res.json();
+                setData(json);
+                } catch (e) {
+                if (e.name !== "AbortError") {
+                    console.error(e);
+                    setData({});
+                    setError("Error getting Pokémon info");
+                }
+                }
+            };
+
+            run();
+            return () => ctrl.abort();
+        }, [pokemon?.name]);
+
+        function AbilityMenu({}) {
+            function setAbility(index) {
+                const ability = apiData.abilities.find(
+                    (item) => (item.ability.name === index)
+                );
+                console.log(ability);
+                setPokemonInfo(prev => {
+                    const nextData = ability;
+                    return { ...prev, ability: nextData };
+                });
+            }
+            const ability = pokemonInfo.ability?.ability?.name;
+            return (
+                <div className="dropdown">
+                <select
+                    value={ability ?? ""}
+                    onChange={(e) => setAbility(e.target.value)}
+                >
+                    <option value="" disabled>
+                    Select an ability
+                    </option>
+                    {apiData.abilities?.map((item, index) => (
+                    <option key={index} value={item.ability.name}>
+                        {item.ability.name}
+                    </option>
+                    ))}
+                </select>
+                </div>
+            );
         }
+
+        function MovesMenu() {
+            function setMove(index){
+                if(selectedMove === -1){
+                    return;
+                }
+
+                const moves = pokemonInfo.moves;
+                moves[selectedMove] = apiData.moves[index];
+                const newData = {...pokemonInfo, moves}
+                saveChanges(newData);
+            }
+            return (
+                <div className="moves-menu">
+                    <div>
+                        {pokemonInfo.moves?.map((item, index) => (
+                        <button key={index} onClick={() => setSelectedMove(index)}>Move {index}: {item.move?.name}</button>
+                    ))}
+                    <button onClick={() => setMove(0)}>SET MOVE TO 0</button>
+                    </div>
+                    
+                    
+                    <div className="moves-container">
+                        {apiData.moves?.map((item, index) => (
+                            <button key={index} onClick={() => setMove(index)}>{item.move.name}</button>
+                        ))}
+                    </div>
+                </div>
+                
+            );
+        }
+
+        const getSprite = (gender, shiny) => {
+            const sprite =
+                shiny ? (gender === "female"
+                        ? (apiData?.sprites?.front_female_shiny || apiData?.sprites?.front_default_shiny)
+                        : apiData?.sprites?.front_shiny)
+                        : (gender === "female"
+                        ? (apiData?.sprites?.front_female || apiData?.sprites?.front_default)
+                        : apiData?.sprites?.front_default);
+            return(sprite);
+        }
+
+        function setGender(gender) {    
+            const sprite = getSprite(gender, pokemonInfo.shiny);
+            const nextPokemon = { ...pokemonInfo, gender, sprite };
+            saveChanges(nextPokemon);
+        }
+
+        function setShiny() {
+            const shiny = !pokemonInfo.shiny;
+            const sprite = getSprite(pokemonInfo.gender, shiny);
+            const nextPokemon = { ...pokemonInfo, shiny, sprite };
+            saveChanges(nextPokemon);
+        }
+
+        function saveChanges(nextPokemon){
+            setTeam(prev => {
+                const next_data = [...prev.pokemon_data];
+                next_data[selectedMember] = nextPokemon;
+                console.log("TEAM");
+                console.log(next_data);
+                return { ...prev, pokemon_data: next_data};
+            });
+            setPokemonInfo(nextPokemon);
+        }
+
         return (
             <div className="Info">
-                <h1>{name}</h1>
-                <p>{types}</p>
-                <button onClick={() => deleteMember(selectedMember, setTeam)}>DELETE</button>
+                <h1>{pokemonInfo.name} ({pokemonInfo.id})</h1>
+                <p>{pokemonInfo.types.join(" | ")}</p>
+                <p>ABILITY: {pokemonInfo?.ability.ability?.name}</p>
+                <AbilityMenu/>
+                <p>GENDER: {pokemonInfo.gender}</p>
+                <div>
+                    <button onClick={() => setGender("male")}>M</button>
+                    <button onClick={() => setGender("female")}>F</button>
+                </div>
+                <p>SPRITE: {pokemonInfo.sprite}</p>
+                <p>SHINY: {pokemonInfo.shiny ? "y" : "n"}</p>
+                <button onClick={() => setShiny(true)}>SHINY</button>
+                <MovesMenu/>
+                <button onClick={() => deleteMember()}>DELETE</button>
             </div>
         )
     }
@@ -74,23 +227,41 @@ const Team = ({selectedTeam, setTeam, selectedMember, setMember,setSearch}) => {
     )
 }
 
-function deleteMember(index, setTeam) {
-    setTeam(prev => {
-    const nextData = [...(prev.pokemon_data ?? [])];
-    delete nextData[index];
-    return { ...prev, pokemon_data: nextData };
-  });
-}
+/*
+    Sample POKE API
+    abilities: {
+    0: {ability1},
+    1: {ability2}, ...}
+*/
+
+/*
+    Sample Team Member JSON
+    id: 0
+    name: ""
+    types: [{type1}, {type2}]
+    ability: {ability}
+    stats: [{hp}, {att}, ... {spe}]
+    sprite: ""
+    held_item: {held_item}
+    moves: [{move1}, {move2}...]
+    gender: ""
+    shiny: 0
+*/
 
 function addMember(index, data, setTeam, setSearch) {
-    console.log(data.name);
-    console.log(index);
     setTeam(prev => {
     const nextData = [...(prev.pokemon_data ?? [])];
     nextData[index] = {
+        "id": data.id,
         "name": data.name,
-        "types": data.types ? [data.types[0], data.types[1]] : ["null", "null"],
-        "sprite": data.sprites.front_default
+        "types": data.types,
+        "stats": data.stats,
+        "sprite": data.sprites.front_default,
+        "held_item": {},
+        "ability": {},
+        "moves": [{}, {}, {}, {}],
+        "gender": "male",
+        "shiny": false
     }
     setSearch(false);
     return { ...prev, pokemon_data: nextData };
@@ -347,42 +518,6 @@ const Search = ({setTeam, selectedIndex, setSearch}) => {
 
 function App() {
 
-    const default_team = {
-        "name": "default",
-        "pokemon_data": [
-            {
-                "name": "Typhlosion",
-                "types": ["Fire", "null"],
-                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png"
-            },
-            {
-                "name": "Noctowl",
-                "types": ["Normal", "Flying"],
-                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/164.png"
-            },
-            {
-                "name": "Ampharos",
-                "types": ["Electric", "null"],
-                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/181.png"
-            },
-            {
-                "name": "Politoed",
-                "types": ["Water", "null"],
-                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/186.png"
-            },
-            {
-                "name": "Espeon",
-                "types": ["Psychic", "null"],
-                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/196.png"
-            },
-            {
-                "name": "Scizor",
-                "types": ["Bug", "Steel"],
-                "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/212.png"
-            }
-        ]
-    }
-
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState(() => {
         return sessionStorage.getItem("message") !== "false";
@@ -493,7 +628,6 @@ function App() {
             <button onClick={signIn}>Sign in</button>
             <button onClick={signOut}>Sign out</button>
             <button onClick={openPopup}>Open Popup</button>
-            <button onClick={() => saveTeam(default_team)}>Save Default</button>
             <button onClick={() => saveTeam(team)}>Save Team</button>
             <button onClick={() => setSearch(true)}>Search</button>
         </div>

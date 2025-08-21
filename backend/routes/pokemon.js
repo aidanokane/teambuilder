@@ -99,12 +99,16 @@ router.get('/:name', async (req, res) => {
             })),
             sprites: {
                 front_default: data.sprites.front_default,
+                front_female: data.sprites.front_female,
                 front_shiny: data.sprites.front_shiny,
+                front_female_shiny: data.sprites.front_shiny_female,
                 back_default: data.sprites.back_default,
                 back_shiny: data.sprites.back_shiny
             },
             height: data.height,
-            weight: data.weight
+            weight: data.weight,
+            abilities: data.abilities,
+            moves: data.moves
         };
         
         res.json(formattedPokemon);
