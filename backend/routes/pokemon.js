@@ -118,4 +118,23 @@ router.get('/:name', async (req, res) => {
     }
 });
 
+router.get('/type/:index', async (req, res) => {
+    const index = req.params.index;    
+    
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/type/${index}`);
+
+        if (!response.ok) {
+            return res.status(404).json({ error: 'Pokémon not found' });
+        }
+
+        const data = await response.json();
+        const pokemon = data.pokemon
+        res.json(pokemon);
+    } catch (err) {
+        console.error('Error fetching Pokémon:', err);
+        res.status(500).json({ error: 'Failed to fetch Pokémon' });
+    }
+})
+
 module.exports = router;

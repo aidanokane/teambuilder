@@ -5,10 +5,16 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
     const [query, setQuery] = useState("");
     const [generations, setGenerations] = useState([]);
     const [pokemonList, setPokemonList] = useState([]);
+    const [pokemonByGeneration, setPokemonByGeneration] = useState([])
     const [filteredPokemon, setFilteredPokemon] = useState([]);
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const [filters, setFilters] = useState({
+        "types": [null, null],
+        "generation": [null]
+    });
 
     useEffect(() => {
         fetchGenerations();
@@ -65,8 +71,9 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
             }));
 
             const merged = payloads.flatMap(p => p.pokemon);
-            setPokemonList(merged)
-            setFilteredPokemon(merged)
+            setPokemonByGeneration(merged)
+            setFilteredPokemon(merged);
+            
         } catch (e) {
             console.error('Failed to fetch generation Pokémon:', e);
             setError('Failed to fetch Pokémon');
@@ -102,11 +109,111 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
         }
     };
 
+    const fetchPokemonByType = async (type, index) => {
+        setLoading(true);
+        setError(null);
+        console.log(index);
+        try{
+            const res = await fetch(`http://localhost:3001/api/pokemon/type/${index}`, {
+                credentials: "include"
+            });
+            
+            if (res.status === 404) {
+                setError("Pokémon not found");
+                return;
+            }
+            if (!res.ok) {
+                setError(`HTTP ${res.status}`);
+                return;
+            }
+            //convert output
+            const data = await res.json();
+            const newTypes = filters.types;
+            newTypes[type] = data.map(p => p.pokemon);
+            const newFilters = {...filters, types: newTypes}
+
+            //set filters and filter with the new ones
+            setFilters(newFilters);
+            filterPokemon(newFilters);
+        } catch (e) {
+            setError(e.message || "Request failed");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
+
     const handleQueryChange = (e) => {
         setQuery(e.target.value);
         setSelectedPokemon(null);
         setError(null);
     };
+
+    const handleGenerationChange = (e) => {
+        // setQuery("");
+        // setSelectedPokemon(null);
+        // setError(null);
+    };
+
+    function union(lists = []) {
+        if(!lists.length) return null;
+        let active = [];
+        for(let i = 0; i < lists.length; i++){
+            if(lists[i]) active.push(lists[i]);
+        }
+        console.log("ACTIVE", active);
+        // let result = [active[0].map(p => [p.pokemon.name, p.pokemon])];
+        let result = pokemonByGeneration;
+        console.log("RESULT[0]", result)
+        for (let i = 0; i < active.length; i++) {
+            console.log("ACTIVE[i]", active[i])
+            let row = active[i]
+            console.log("ROW", row);
+            const keys = new Set(row.map(o => o.name));
+            console.log("KEYS", keys);
+            result = result.filter(p => keys.has(p.name));
+        }
+        
+        console.log("RESULT", result);
+        return result;
+    }
+
+    function filterPokemon(newFilters){
+        function getDexNumber(url){
+            const m = String(url).trim().match(/\/(?:pokemon|pokemon-species)\/(\d+)\/?$/);
+            console.log(m);
+            return m ? Number(m[1]) : null;
+        }
+        console.log("Fetching pokemon with the following filters", newFilters);
+        console.log("FILTERED POKEMON",filteredPokemon);
+        let lists = Object.values(newFilters);
+        console.log("LISTS", lists);
+
+        // const types = [...filters.types[0], ...filters.types[1]];
+        // console.log("TYPES", types);
+        // const entries = types.map(p => [p.pokemon.name, p.pokemon]);
+        // console.log("ENTRIES", entries);
+        // const merged = [...new Map(entries).values()];
+        // console.log("MERGED", merged);
+
+        const type1 = filters.types[0] ?? null;
+        const type2 = filters.types[1] ?? null;
+        let unioned = union([type1, type2]);
+        console.log("UNIONED", unioned);
+
+        let activeFilters = [unioned];
+        for(let i = 1; i < lists.length; i++){
+            if(!lists[i]?.length){
+                activeFilters.push(lists[i]);
+                console.log("PUSH", lists[i], lists[i].length);}
+        }
+
+        console.log("ACTIVE FILTERS", activeFilters);
+        const newFiltered = union(activeFilters).map(p => ({name: p.name, url: p.url, pokedexNumber: getDexNumber(p.url)}));
+        console.log("NEWFILTERED", newFiltered);
+        setFilteredPokemon(newFiltered);
+    }
 
     const handlePokemonClick = (pokemonName) => {
         fetchPokemonDetails(pokemonName);
@@ -138,16 +245,17 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
                     <div className="Search-Left">
                         <div className="Search-Input-Section">
                             <h3>Generation</h3>
-                            <select
+                            {/* <select 
                                 className="Generation-Select"
                                 value={selectedGeneration}
+                                onChange={handleGenerationChange}
                             >
                                 {generations.map((gen, index) => (
                                     <option key={gen.name} value={index + 1}>
                                         {gen.name.replace('generation-', 'Generation ').toUpperCase()}
                                     </option>
                                 ))}
-                            </select>
+                            </select> */}
 
                             <h3>Search Pokémon</h3>
                             <input
