@@ -12,8 +12,9 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
     const [error, setError] = useState(null);
 
     const [filters, setFilters] = useState({
-        "types": [null, null],
-        "generation": [null]
+        "type1": [],
+        "type2": [],
+        "generation": []
     });
 
     useEffect(() => {
@@ -54,7 +55,8 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
             }));
 
             const merged = payloads.flatMap(p => p.pokemon);
-            setPokemonByGeneration(merged)
+            setPokemonByGeneration(merged);
+            console.log("POKEMON UP TO GENERATION 2", merged);
             setFilteredPokemon(merged);
             
         } catch (e) {
@@ -110,10 +112,9 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
             }
             //convert output
             const data = await res.json();
-            const newTypes = filters.types;
-            newTypes[type] = data.map(p => p.pokemon);
-            const newFilters = {...filters, types: newTypes}
-
+            const newTypes = data.map(p => p.pokemon);
+            const newFilters = (type) ? {...filters, type1: newTypes} : {...filters, type2: newTypes}
+            console.log("NEW FILTERS", (type), newFilters);
             //set filters and filter with the new ones
             setFilters(newFilters);
             filterPokemon(newFilters);
@@ -124,7 +125,40 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
         }
     }
 
+    const fetchGenerationFilters = async(id) => {
+        setLoading(true);
+        setError(null);
+        let newGenerationFilter = [];
+        
+        try {
+            const res = await fetch(`http://localhost:3001/api/pokemon/generation/${id}`, {
+                credentials: "include",
+            });
 
+            if (res.status === 404) {
+                // setError("Pokémon not found");
+                console.log("Showing pokemon from all generations")
+            } else {
+                if (!res.ok) {
+                    setError(`HTTP ${res.status}`);
+                    return;
+                }
+
+                const data = await res.json();
+                // console.log("DATA", data);
+                newGenerationFilter = data.pokemon.map(p => p);
+            }
+            // console.log("NEW GENERATION FILTER", newGenerationFilter);
+            const newFilters = {...filters, generation: newGenerationFilter};
+            // console.log("NEW FILTERS",newFilters);
+            setFilters(newFilters);
+            filterPokemon(newFilters);
+        } catch (e) {
+            setError(e.message || "Request failed");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const handleQueryChange = (e) => {
         setQuery(e.target.value);
@@ -133,7 +167,6 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
     };
 
     function union(lists = []) {
-        if(!lists.length) return null;
         let active = [];
         for(let i = 0; i < lists.length; i++){
             if(lists[i]) active.push(lists[i]);
@@ -156,14 +189,10 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
             return m ? Number(m[1]) : null;
         }
         let lists = Object.values(newFilters);
-
-        const type1 = filters.types[0] ?? null;
-        const type2 = filters.types[1] ?? null;
-        let unioned = union([type1, type2]);
-
-        let activeFilters = [unioned];
-        for(let i = 1; i < lists.length; i++){
-            if(!lists[i]?.length) activeFilters.push(lists[i]);
+        console.log("Lists", lists);
+        let activeFilters = [];
+        for(let i = 0; i < lists.length; i++){
+            if(lists[i]?.length) activeFilters.push(lists[i]);
         }
 
         const newFiltered = union(activeFilters).map(p => ({name: p.name, url: p.url, pokedexNumber: getDexNumber(p.url)}));
@@ -203,7 +232,7 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
                             <select 
                                 className="Generation-Select"
                                 defaultValue={0}
-                                // onChange={handleGenerationChange}
+                                onChange={(e) => fetchGenerationFilters(e.target.value)}
                             >
                                 <option key={0} value={0}>All</option>
                                 {generations.map(index => (
