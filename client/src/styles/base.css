@@ -5,13 +5,37 @@
   --color-4: #898ac4;  /* Secondary accent (hover, alerts) */
 }
 
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+/* Main App Structure */
 .App {
   text-align: center;
   background-color: var(--color-1);
   width: 100vw;
+  min-height: 100vh;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .navbar {
@@ -23,18 +47,49 @@
   background-color: var(--color-2);
   color: black;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 0 20px;
   z-index: 1000;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.navbar-left {
+  flex: 1;
+  text-align: left;
+}
+
+.team-loaded-indicator {
+  background-color: var(--color-3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: normal;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.main-content {
+  position: relative;
+  top: 60px;
+  min-height: calc(100vh - 60px - 120px); /* Account for navbar and debug bar */
+  padding-bottom: 120px; /* Space for debug bar */
+}
+
+.app-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 .Debug-Bar {
   position: fixed;
-  bottom: 30px;
+  bottom: 0;
+  left: 0;
   height: 60px;
   width: 100%;
   background-color: var(--color-2);
@@ -43,19 +98,20 @@
   justify-content: center;
   align-items: center;
   gap: 16px;
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .Debug-Bar button {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background-color: var(--color-3);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 1500;
+  font-size: 0.9rem;
   transition: background-color 0.2s ease;
 }
 

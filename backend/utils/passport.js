@@ -23,7 +23,7 @@ passport.use(new GoogleStrategy({
             SET email = EXCLUDED.email,
                 name  = EXCLUDED.name
             RETURNING *`,
-            [profile.id, profile.emails, profile.displayName]
+            [profile.id, profile.emails[0].value, profile.displayName]
         );
     return done(null, user);
 }));

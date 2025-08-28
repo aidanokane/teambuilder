@@ -25,7 +25,7 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
         if (query.trim() === '') {
             setFilteredPokemon(pokemonList);
         } else {
-            const filtered = pokemonList.filter(pokemon => 
+            const filtered = pokemonList.filter(pokemon =>
                 pokemon.name.toLowerCase().includes(query.toLowerCase())
             );
             setFilteredPokemon(filtered);
@@ -68,7 +68,7 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
     const fetchPokemonDetails = async (pokemonName) => {
         setLoading(true);
         setError(null);
-        
+
         try {
             const res = await fetch(`http://localhost:3001/api/pokemon/${pokemonName}`, {
                 credentials: "include",
@@ -82,7 +82,7 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                 setError(`HTTP ${res.status}`);
                 return;
             }
-            
+
             const data = await res.json();
             setSelectedPokemon(data);
         } catch (e) {
@@ -114,6 +114,13 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
             e.preventDefault();
         }
     };
+
+    const handleAddPokemon = () => {
+        if (selectedPokemon) {
+            addMember(selectedIndex, selectedPokemon, setTeam, setSearch);
+        }
+    };
+
     console.log(selectedIndex);
 
     return (
@@ -121,14 +128,14 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
             <div className="Search-Popup">
                 <div className="Search-Header">
                     <h1>Pokemon Search</h1>
-                    <button className="Close-Button" onClick={() => setSearch(false)}>X</button>
+                    <button className="Close-Button" onClick={() => setSearch(false)}>✕</button>
                 </div>
-                
+
                 <div className="Search-Body">
                     <div className="Search-Left">
                         <div className="Search-Input-Section">
                             <h3>Generation</h3>
-                            <select 
+                            <select
                                 className="Generation-Select"
                                 value={selectedGeneration}
                                 onChange={handleGenerationChange}
@@ -139,7 +146,7 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                                     </option>
                                 ))}
                             </select>
-                            
+
                             <h3>Search Pokémon</h3>
                             <input
                                 className="Search-Input"
@@ -149,7 +156,7 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                                 placeholder="Type to filter Pokémon..."
                                 autoFocus
                             />
-                            
+
                             {error && (
                                 <div className="Error-Message">
                                     {error}
@@ -170,7 +177,7 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                                             onClick={() => handlePokemonClick(pokemon.name)}
                                             title={`${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)} (#${pokemon.pokedexNumber})`}
                                         >
-                                            <img 
+                                            <img
                                                 src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokedexNumber}.png`}
                                                 alt={pokemon.name}
                                                 className="Pokemon-Grid-Sprite"
@@ -186,8 +193,8 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                         {selectedPokemon ? (
                             <div className="Pokemon-Details">
                                 <div className="Pokemon-Header">
-                                    <img 
-                                        src={selectedPokemon.sprites.front_default} 
+                                    <img
+                                        src={selectedPokemon.sprites.front_default}
                                         alt={selectedPokemon.name}
                                         className="Pokemon-Sprite"
                                     />
@@ -216,16 +223,16 @@ const Search = ({ setTeam, selectedIndex, setSearch }) => {
                                 </div>
 
                                 <div className="Pokemon-Actions">
-                                    <p className="Team-Note">
-                                        <button onClick={() => addMember(selectedIndex, selectedPokemon, setTeam, setSearch)}>ADD</button>
-                                    </p>
+                                    <button onClick={handleAddPokemon}>
+                                        ADD TO TEAM
+                                    </button>
                                 </div>
                             </div>
                         ) : (
                             <div className="Search-Placeholder">
-                                <div className="Placeholder-Icon">Search</div>
+                                <div className="Placeholder-Icon">🔍</div>
                                 <h3>Select a Pokemon</h3>
-                                <p>Choose a generation and click on a Pokemon sprite to view details</p>
+                                <p>Choose a generation and click on a Pokemon sprite to view details and add it to your team</p>
                             </div>
                         )}
                     </div>
