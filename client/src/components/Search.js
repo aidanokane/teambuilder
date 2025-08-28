@@ -234,22 +234,20 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                 <div className="Search-Body">
                     <div className="Search-Left">
                         <div className="Search-Input-Section">
-                            <h3>Generation</h3>
-                            <select 
-                                className="Generation-Select"
-                                defaultValue={0}
-                                onChange={(e) => fetchGenerationFilters(e.target.value)}
-                            >
-                                <option key={0} value={0}>All</option>
-                                {generations.map(index => (
-                                    <option key={index} value={index}>
-                                        Generation {index}
-                                    </option>
-                                ))}
-                            </select>
-                            {["Type 1", "Type 2"].map((value, index) => (
+                            <h3>Search Pokémon</h3>
+                            <input
+                                className="Search-Input"
+                                value={query}
+                                onChange={handleQueryChange}
+                                onKeyDown={handleKeyDown}
+                                placeholder="Type to filter Pokémon..."
+                                autoFocus
+                            />
+                            <h3>Types</h3>
+                            <div className="Types-Input">
+                                {["Type 1", "Type 2"].map((value, index) => (
                                 <div key={index}>
-                                    <label for={value}>Type {index}</label>
+                                    <p>{value}</p>
                                     <select
                                         className="TypeSelect"
                                         name={value}
@@ -266,15 +264,20 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                                     </select>
                                 </div>
                             ))}
-                            <h3>Search Pokémon</h3>
-                            <input
-                                className="Search-Input"
-                                value={query}
-                                onChange={handleQueryChange}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Type to filter Pokémon..."
-                                autoFocus
-                            />
+                            </div>
+                            <h3>Generation</h3>
+                            <select className="Generation-Select"
+                                defaultValue={0}
+                                onChange={(e) => fetchGenerationFilters(e.target.value)}
+                            >
+                                <option key={0} value={0}>All</option>
+                                {generations.map(index => (
+                                    <option key={index} value={index}>
+                                        Generation {index}
+                                    </option>
+                                ))}
+                            </select>
+                            
 
                             {error && (
                                 <div className="Error-Message">

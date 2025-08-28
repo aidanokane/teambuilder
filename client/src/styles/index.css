@@ -827,6 +827,25 @@ body {
     border-color: var(--color-4);
 }
 
+.Types-Input {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+}
+
+.Types-Input select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--color-3);
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: white;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
 .Error-Message {
     background-color: #ffebee;
     color: #c62828;
