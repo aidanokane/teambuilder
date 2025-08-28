@@ -118,9 +118,23 @@ router.get('/:name', async (req, res) => {
     }
 });
 
+router.get('/list', async (req, res) => {
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/type/`);
+
+        const data = await response.json();
+        console.log(data);
+        const types = data.results
+        res.json(types);
+    } catch (err) {
+        console.error('Error fetching Types List:', err);
+        res.status(500).json({ error: 'Failed to fetch Types List' });
+    }
+})
+
 router.get('/type/:index', async (req, res) => {
     const index = req.params.index;    
-    
+    console.log("GETTING TYPE");
     try {
         const response = await fetch(`https://pokeapi.co/api/v2/type/${index}`);
 

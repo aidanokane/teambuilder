@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { addMember } from "../utils/teamUtils";
 
-const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
+const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesList }) => {
     const [query, setQuery] = useState("");
     const [generations, setGenerations] = useState([]);
     const [pokemonList, setPokemonList] = useState([]);
@@ -94,26 +94,30 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
         }
     };
 
-    const fetchPokemonByType = async (type, index) => {
+    const fetchPokemonByType = async (index, type) => {
+        let newTypes = [];
         setLoading(true);
         setError(null);
         try{
-            const res = await fetch(`http://localhost:3001/api/pokemon/type/${index}`, {
-                credentials: "include"
-            });
-            
-            if (res.status === 404) {
-                setError("Pokémon not found");
-                return;
+            if(type > 0){
+                const res = await fetch(`http://localhost:3001/api/pokemon/type/${type}`, {
+                    credentials: "include"
+                });
+                
+                if (res.status === 404) {
+                    setError("Pokémon not found");
+                    return;
+                }
+                if (!res.ok) {
+                    setError(`HTTP ${res.status}`);
+                    return;
+                }
+                console.log("INDEX", index);
+                //convert output
+                const data = await res.json();
+                newTypes = data.map(p => p.pokemon);
             }
-            if (!res.ok) {
-                setError(`HTTP ${res.status}`);
-                return;
-            }
-            //convert output
-            const data = await res.json();
-            const newTypes = data.map(p => p.pokemon);
-            const newFilters = (type) ? {...filters, type1: newTypes} : {...filters, type2: newTypes}
+            const newFilters = index.index ? {...filters, type1: newTypes} : {...filters, type2: newTypes}
             console.log("NEW FILTERS", (type), newFilters);
             //set filters and filter with the new ones
             setFilters(newFilters);
@@ -131,14 +135,16 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
         let newGenerationFilter = [];
         
         try {
-            const res = await fetch(`http://localhost:3001/api/pokemon/generation/${id}`, {
-                credentials: "include",
-            });
+            if(id > 0){
+                const res = await fetch(`http://localhost:3001/api/pokemon/generation/${id}`, {
+                    credentials: "include",
+                });
 
-            if (res.status === 404) {
-                // setError("Pokémon not found");
-                console.log("Showing pokemon from all generations")
-            } else {
+                if (res.status === 404) {
+                    setError("Pokémon not found");
+                    return;
+                }
+
                 if (!res.ok) {
                     setError(`HTTP ${res.status}`);
                     return;
@@ -240,8 +246,26 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration }) => {
                                         Generation {index}
                                     </option>
                                 ))}
-                            </select> */}
-
+                            </select>
+                            {["Type 1", "Type 2"].map((value, index) => (
+                                <div key={index}>
+                                    <label for={value}>Type {index}</label>
+                                    <select
+                                        className="TypeSelect"
+                                        name={value}
+                                        id={index}
+                                        defaultValue={0}
+                                        onChange={(e) => fetchPokemonByType({index}, e.target.value)} 
+                                    >
+                                        <option key={0} value={0}>All</option>
+                                        {typesList.map((value, index) => (
+                                            <option key={index+1} value={index+1}>
+                                                {value}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ))}
                             <h3>Search Pokémon</h3>
                             <input
                                 className="Search-Input"

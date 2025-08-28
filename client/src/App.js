@@ -49,6 +49,12 @@ function App() {
         window.location.href = 'http://localhost:3001/auth/logout';
     };
 
+    const typesList = [
+        "normal", "fighting", "flying", "poison", "ground", "rock", "bug",
+        "ghost", "steel", "fire", "water", "grass", "electric", "psychic",
+        "ice", "dragon", "dark", "fairy"
+    ]
+
     const fetchStatus = useCallback(async ({ signal } = {}) => {
         try {
             const res = await fetch(`http://localhost:3001/auth/status`, {
@@ -338,6 +344,7 @@ function App() {
                         selectedIndex={selectedMember} 
                         setSearch={setSearch} 
                         selectedGeneration={selectedGeneration}
+                        typesList={typesList}
                     />
                 )}
             </div>
