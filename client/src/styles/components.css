@@ -43,6 +43,77 @@
   width: 76vw;
 }
 
+.Team-Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--color-2);
+}
+
+.Team-Header h2 {
+  margin: 0;
+  color: var(--color-4);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.Team-Name-Section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.Team-Name-Input {
+  background-color: white;
+  border: 2px solid var(--color-2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--color-4);
+  min-width: 150px;
+  transition: border-color 0.2s ease;
+}
+
+.Team-Name-Input:focus {
+  outline: none;
+  border-color: var(--color-4);
+}
+
+.Save-Team-Button {
+  background-color: var(--color-4);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.Save-Team-Button:hover {
+  background-color: var(--color-1);
+  color: var(--color-4);
+}
+
+.New-Team-Button {
+  background-color: var(--color-3);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.New-Team-Button:hover {
+  background-color: var(--color-4);
+}
+
 /* ============================================================================
    TEAMS MANAGEMENT COMPONENT
    ============================================================================ */
