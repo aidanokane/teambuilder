@@ -345,7 +345,6 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
             const sprite =
                 shiny ? (gender === "female"
                         ? (apiData?.sprites?.front_female_shiny || apiData?.sprites?.front_shiny)
-                        ? (apiData?.sprites?.front_female_shiny || apiData?.sprites?.front_shiny)
                         : apiData?.sprites?.front_shiny)
                     : (gender === "female"
                         ? (apiData?.sprites?.front_female || apiData?.sprites?.front_default)
@@ -524,7 +523,8 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                 <div className="Team-Name-Section">
                     <input
                         type="text"
-                        value={selectedTeam?.name || 'Untitled'}
+                        defaultValue={selectedTeam?.name || 'Untitled'}
+                        value={selectedTeam?.name}
                         onChange={(e) => setTeam(prev => {
                             // Ensure prev is a valid team object
                             if (!prev || typeof prev !== 'object') {
@@ -575,7 +575,8 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                     />
                 </div>
             </div>
-            <select value={selectedGeneration}
+            <select className="Generation-Select"
+                    value={selectedGeneration}
                     onChange={(e) => setSelectedGeneration(e.target.value)}>{[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
                 <option key={index} value={index+1}>Generation {index+1}</option>
             ))}</select>

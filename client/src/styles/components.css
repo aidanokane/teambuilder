@@ -840,11 +840,10 @@
 }
 
 .Search-Body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  height: 100%;
-  overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(220px, 24%) minmax(0, 1fr) minmax(280px, 26%);
+    gap: 20px;
+    min-height: 0;
 }
 
 .Search-Left {
@@ -895,6 +894,13 @@
   text-align: center;
   color: black;
   padding: 20px;
+}
+
+.Search-Middle {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
 }
 
 .Pokemon-Grid {

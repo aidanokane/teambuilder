@@ -789,13 +789,12 @@ body {
 
 .Search-Body {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(220px, 24%) minmax(0, 1fr) minmax(280px, 26%);
     gap: 20px;
-    height: 100%;
-    overflow: hidden;
+    min-height: 0;
 }
 
-.Search-Left {
+.Search-Left, Search-Middle {
     display: flex;
     flex-direction: column;
     gap: 15px;

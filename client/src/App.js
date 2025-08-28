@@ -53,7 +53,7 @@ function App() {
         "normal", "fighting", "flying", "poison", "ground", "rock", "bug",
         "ghost", "steel", "fire", "water", "grass", "electric", "psychic",
         "ice", "dragon", "dark", "fairy"
-    ]
+    ];
 
     const fetchStatus = useCallback(async ({ signal } = {}) => {
         try {
@@ -329,6 +329,8 @@ function App() {
                         onNewTeam={createNewTeam}
                         teams={teams}
                         setTeams={setTeams}
+                        selectedGeneration={selectedGeneration}
+                        setSelectedGeneration={setSelectedGeneration}
                     />
                     <Teams
                         teams={teams}

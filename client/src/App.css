@@ -166,8 +166,8 @@
     width: 90vw;
     height: 80vh;
     text-align: left;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
     overflow: hidden;
 }
 
@@ -200,19 +200,18 @@
     background-color: var(--color-4);
 }
 
-.Search-Body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    height: 100%;
-    overflow: hidden;
+.Search-Left {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
-.Search-Left {
+.Search-Middle {
     display: flex;
     flex-direction: column;
     gap: 15px;
     overflow-y: auto;
+    width: auto;
 }
 
 .Search-Input-Section h3,
@@ -294,6 +293,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    width: auto;
 }
 
 .Pokemon-Details {

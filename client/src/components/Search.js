@@ -282,7 +282,8 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                                 </div>
                             )}
                         </div>
-
+                    </div>
+                    <div className="Search-Middle">
                         <div className="Pokemon-Grid-Section">
                             <h3>Pokémon ({filteredPokemon.length})</h3>
                             {loading ? (
@@ -307,7 +308,6 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                             )}
                         </div>
                     </div>
-
                     <div className="Search-Right">
                         {selectedPokemon ? (
                             <div className="Pokemon-Details">
