@@ -1,7 +1,188 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onSaveTeam, onNewTeam }) => {
+const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onSaveTeam, onNewTeam, teams, setTeams }) => {
     const team = selectedTeam ? selectedTeam.pokemon_data : [];
+    const fileInputRef = useRef(null);
+
+    // CSV Export functionality
+    const exportToCSV = () => {
+        if (!teams || teams.length === 0) {
+            alert('No teams to export!');
+            return;
+        }
+
+        const csvData = [];
+
+        teams.forEach(team => {
+            const teamName = team.name || 'Untitled';
+            const pokemonData = Array.isArray(team.pokemon_data) ? team.pokemon_data : [];
+
+            // If team has no Pokemon, still add a row for the team
+            if (pokemonData.every(p => !p)) {
+                csvData.push({
+                    team_name: teamName,
+                    team_id: team.id || '',
+                    pokemon_name: '',
+                    pokemon_id: '',
+                    types: '',
+                    ability: '',
+                    move_1: '',
+                    move_2: '',
+                    move_3: '',
+                    move_4: '',
+                    gender: '',
+                    shiny: '',
+                    slot_position: ''
+                });
+            } else {
+                // Add each Pokemon as a row
+                pokemonData.forEach((pokemon, index) => {
+                    if (pokemon) {
+                        csvData.push({
+                            team_name: teamName,
+                            team_id: team.id || '',
+                            pokemon_name: pokemon.name || '',
+                            pokemon_id: pokemon.id || '',
+                            types: Array.isArray(pokemon.types) ? pokemon.types.join('|') : '',
+                            ability: pokemon.ability?.ability?.name || '',
+                            move_1: pokemon.moves?.[0]?.move?.name || '',
+                            move_2: pokemon.moves?.[1]?.move?.name || '',
+                            move_3: pokemon.moves?.[2]?.move?.name || '',
+                            move_4: pokemon.moves?.[3]?.move?.name || '',
+                            gender: pokemon.gender || 'male',
+                            shiny: pokemon.shiny ? 'true' : 'false',
+                            slot_position: index + 1
+                        });
+                    }
+                });
+            }
+        });
+
+        // Convert to CSV string
+        const headers = Object.keys(csvData[0] || {});
+        const csvString = [
+            headers.join(','),
+            ...csvData.map(row =>
+                headers.map(header => {
+                    const value = row[header]?.toString() || '';
+                    // Escape commas and quotes in CSV values
+                    return value.includes(',') || value.includes('"') ? `"${value.replace(/"/g, '""')}"` : value;
+                }).join(',')
+            )
+        ].join('\n');
+
+        // Create and trigger download
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `pokemon_teams_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log('Teams exported to CSV successfully');
+    };
+
+    // CSV Import functionality
+    const importFromCSV = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+
+                const importedTeams = {};
+
+                // Parse CSV data
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+
+                    const values = [];
+                    let currentValue = '';
+                    let inQuotes = false;
+
+                    // Simple CSV parser that handles quoted values
+                    for (let j = 0; j < lines[i].length; j++) {
+                        const char = lines[i][j];
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            values.push(currentValue.trim());
+                            currentValue = '';
+                        } else {
+                            currentValue += char;
+                        }
+                    }
+                    values.push(currentValue.trim());
+
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+
+                    const teamName = row.team_name || 'Imported Team';
+
+                    if (!importedTeams[teamName]) {
+                        importedTeams[teamName] = {
+                            name: teamName,
+                            pokemon_data: Array(6).fill(null)
+                        };
+                    }
+
+                    // Add Pokemon to team if data exists
+                    if (row.pokemon_name && row.slot_position) {
+                        const slotIndex = parseInt(row.slot_position) - 1;
+                        if (slotIndex >= 0 && slotIndex < 6) {
+                            importedTeams[teamName].pokemon_data[slotIndex] = {
+                                name: row.pokemon_name,
+                                id: parseInt(row.pokemon_id) || null,
+                                types: row.types ? row.types.split('|') : [],
+                                ability: row.ability ? { ability: { name: row.ability } } : null,
+                                moves: [
+                                    row.move_1 ? { move: { name: row.move_1 } } : null,
+                                    row.move_2 ? { move: { name: row.move_2 } } : null,
+                                    row.move_3 ? { move: { name: row.move_3 } } : null,
+                                    row.move_4 ? { move: { name: row.move_4 } } : null
+                                ],
+                                gender: row.gender || 'male',
+                                shiny: row.shiny === 'true',
+                                sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${row.pokemon_id || '1'}.png`
+                            };
+                        }
+                    }
+                }
+
+                // Add imported teams to existing teams
+                const teamsArray = Object.values(importedTeams);
+                if (teamsArray.length > 0) {
+                    setTeams(prev => [...(Array.isArray(prev) ? prev : []), ...teamsArray]);
+                    alert(`Successfully imported ${teamsArray.length} team(s)!`);
+                    console.log('Imported teams:', teamsArray);
+                } else {
+                    alert('No valid team data found in CSV file.');
+                }
+
+            } catch (error) {
+                console.error('Error importing CSV:', error);
+                alert('Error importing CSV file. Please check the file format.');
+            }
+        };
+
+        reader.readAsText(file);
+
+        // Reset file input
+        event.target.value = '';
+    };
+
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
 
     const Info = ({ pokemon }) => {
         const [pokemonInfo, setPokemonInfo] = useState(() => {
@@ -369,6 +550,28 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                     >
                         + New Team
                     </button>
+                    <button
+                        className="Export-CSV-Button"
+                        onClick={exportToCSV}
+                        disabled={!teams || teams.length === 0}
+                        title="Export all teams to CSV"
+                    >
+                        📄 Export CSV
+                    </button>
+                    <button
+                        className="Import-CSV-Button"
+                        onClick={handleImportClick}
+                        title="Import teams from CSV"
+                    >
+                        📁 Import CSV
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".csv"
+                        onChange={importFromCSV}
+                        style={{ display: 'none' }}
+                    />
                 </div>
             </div>
             <div className="Team-Bar">
