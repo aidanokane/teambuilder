@@ -59,55 +59,161 @@
   font-weight: 600;
 }
 
+/* CSV Import/Export Button Styles */
+
 .Team-Name-Section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px; /* Reduced gap to fit more buttons */
+  flex-wrap: wrap; /* Allow wrapping if needed on smaller screens */
 }
 
-.Team-Name-Input {
-  background-color: white;
-  border: 2px solid var(--color-2);
+.Export-CSV-Button,
+.Import-CSV-Button {
+  height: 40px; /* Match other button heights */
+  padding: 0 12px; /* Slightly smaller padding for CSV buttons */
+  border: none;
   border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  color: var(--color-4);
-  min-width: 150px;
-  transition: border-color 0.2s ease;
+  cursor: pointer;
+  font-size: 0.85rem; /* Slightly smaller font */
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  gap: 4px; /* Space between icon and text */
 }
 
-.Team-Name-Input:focus {
-  outline: none;
-  border-color: var(--color-4);
+.Export-CSV-Button {
+  background-color: #28a745; /* Green for export */
+  color: white;
+  border: 2px solid #28a745;
+}
+
+.Export-CSV-Button:hover:not(:disabled) {
+  background-color: #218838;
+  border-color: #1e7e34;
+  transform: translateY(-1px);
+}
+
+.Export-CSV-Button:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.Import-CSV-Button {
+  background-color: #007bff; /* Blue for import */
+  color: white;
+  border: 2px solid #007bff;
+}
+
+.Import-CSV-Button:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+  transform: translateY(-1px);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 1200px) {
+  .Team-Name-Section {
+    gap: 6px;
+  }
+
+  .Team-Name-Input {
+    min-width: 140px; /* Smaller on mobile */
+  }
+
+  .Export-CSV-Button,
+  .Import-CSV-Button,
+  .Save-Team-Button,
+  .New-Team-Button {
+    padding: 0 10px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .Team-Name-Section {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .Team-Name-Input {
+    width: 100%;
+    min-width: unset;
+    order: 1;
+  }
+
+  .Save-Team-Button,
+  .New-Team-Button,
+  .Export-CSV-Button,
+  .Import-CSV-Button {
+    flex: 1;
+    min-width: 90px;
+    order: 2;
+  }
+}
+
+/* Enhanced Team Header for better alignment */
+.Team-Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Changed from center to flex-start */
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--color-2);
+  min-height: 50px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.Team-Header h2 {
+  margin: 0;
+  color: var(--color-4);
+  font-size: 1.5rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  align-self: center; /* Center the title vertically */
+}
+
+/* Ensure buttons maintain consistent styling */
+.Save-Team-Button,
+.New-Team-Button,
+.Export-CSV-Button,
+.Import-CSV-Button {
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .Save-Team-Button {
   background-color: var(--color-4);
   color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
 }
 
-.Save-Team-Button:hover {
+.Save-Team-Button:hover:not(:disabled) {
   background-color: var(--color-1);
   color: var(--color-4);
+}
+
+.Save-Team-Button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .New-Team-Button {
   background-color: var(--color-3);
   color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
 }
 
 .New-Team-Button:hover {

@@ -320,6 +320,8 @@ function App() {
                         setSearch={setSearch}
                         onSaveTeam={saveTeam}
                         onNewTeam={createNewTeam}
+                        teams={teams}
+                        setTeams={setTeams}
                     />
                     <Teams
                         teams={teams}
