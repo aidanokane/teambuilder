@@ -351,14 +351,14 @@ function App() {
                 )}
             </div>
 
-            <div className="Debug-Bar">
+            {/* <div className="Debug-Bar">
                 <button onClick={() => fetchStatus()}>Get User Info</button>
                 <button onClick={() => fetchTeams()}>Refresh Teams</button>
                 <button onClick={signIn}>Sign in</button>
                 <button onClick={signOut}>Sign out</button>
                 <button onClick={openPopup}>Open Popup</button>
                 <button onClick={() => setSearch(true)}>Search</button>
-            </div>
+            </div> */}
         </div>
     );
 }
