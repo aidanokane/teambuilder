@@ -224,7 +224,7 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                 try {
                     setError(null);
                     const name = pokemon.name.trim().toLowerCase();
-                    const res = await fetch(`http://localhost:3001/api/pokemon/${name}`, {
+                    const res = await fetch(`http://localhost:3001/api/pokemon/pokemon/${name}`, {
                         credentials: "include",
                         signal: ctrl.signal,
                     });

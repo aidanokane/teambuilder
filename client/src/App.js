@@ -19,7 +19,7 @@ function App() {
     const [search, setSearch] = useState(false);
     const [loadedTeamName, setLoadedTeamName] = useState(null);
     const [isTeamLoaded, setIsTeamLoaded] = useState(false);
-    const [selectedGeneration, setSelectedGeneration] = useState(2);
+    const [selectedGeneration, setSelectedGeneration] = useState(9);
 
     const closePopup = useCallback(() => {
         setMessage(false);

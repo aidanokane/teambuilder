@@ -224,7 +224,9 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
             }
 
             const data = await res.json();
-            setAbilityList(data.map(ability => ability.name));
+            const abilities = data.map(ability => ability.name).sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }))
+            setAbilityList(abilities);
+            setFilteredAbilities(abilities)
         } catch (e) {
             console.error("Error getting abilities:", e);
             setError(e);
@@ -241,8 +243,7 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
 
     const handleAbilityQueryChange = (value) => {
         setAbilityQuery(value);
-        console.log(abilityList);
-        const abilities = abilityList.filter(ability => ability.includes(value));
+        const abilities = abilityList.filter(ability => ability.startsWith(value));
         setFilteredAbilities(abilities);
     }
 
@@ -339,18 +340,22 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                             </div>
                             <h3>Ability</h3>
                             <input
-                                className="Ability-Input"
-                                value={abilityQuery}
-                                onChange={(e) => handleAbilityQueryChange(e.target.value)}
+                            className="Ability-Input"
+                            value={abilityQuery}
+                            onChange={(e) => handleAbilityQueryChange(e.target.value)}
                             />
                             <div className="Ability-List">
-                                {filteredAbilities.map((ability, index) => (
+                            {filteredAbilities.map((ability) => (
                                 <button
-                                    key={index}
-                                    value={ability}
-                                    onClick={(e) => fetchPokemonByAbility(e.target.value)}
-                                >{ability}</button>
-                                ))}
+                                key={ability}
+                                type="button"
+                                value={ability}
+                                onClick={(e) => fetchPokemonByAbility(e.currentTarget.value)}
+                                title={ability}
+                                >
+                                {ability}
+                                </button>
+                            ))}
                             </div>
                             <h3>Generation</h3>
                             <select className="Generation-Select"

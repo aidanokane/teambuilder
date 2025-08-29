@@ -151,14 +151,12 @@ router.get('/ability/:name', async (req, res) => {
 });
 
 router.get('/abilities', async (req, res) => {
-    console.log("GETTING ABILITIES LIST");
     try {
         const response = await fetch(`https://pokeapi.co/api/v2/ability?limit=500&offset=0`);
         
         if (!response.ok) {
             return res.sendStatus(response.status);
         }
-
         const data = await response.json();
         res.json(data.results);
     } catch (e) {
