@@ -19,6 +19,7 @@ function App() {
     const [search, setSearch] = useState(false);
     const [loadedTeamName, setLoadedTeamName] = useState(null);
     const [isTeamLoaded, setIsTeamLoaded] = useState(false);
+    const [selectedGeneration, setSelectedGeneration] = useState(9);
 
     const closePopup = useCallback(() => {
         setMessage(false);
@@ -47,6 +48,12 @@ function App() {
         setMember(0);
         window.location.href = 'http://localhost:3001/auth/logout';
     };
+
+    const typesList = [
+        "normal", "fighting", "flying", "poison", "ground", "rock", "bug",
+        "ghost", "steel", "fire", "water", "grass", "electric", "psychic",
+        "ice", "dragon", "dark", "fairy"
+    ];
 
     const fetchStatus = useCallback(async ({ signal } = {}) => {
         try {
@@ -322,6 +329,8 @@ function App() {
                         onNewTeam={createNewTeam}
                         teams={teams}
                         setTeams={setTeams}
+                        selectedGeneration={selectedGeneration}
+                        setSelectedGeneration={setSelectedGeneration}
                     />
                     <Teams
                         teams={teams}
@@ -332,22 +341,24 @@ function App() {
                 </div>
 
                 {search && (
-                    <Search
-                        setTeam={setTeam}
-                        selectedIndex={selectedMember}
-                        setSearch={setSearch}
+                    <Search 
+                        setTeam={setTeam} 
+                        selectedIndex={selectedMember} 
+                        setSearch={setSearch} 
+                        selectedGeneration={selectedGeneration}
+                        typesList={typesList}
                     />
                 )}
             </div>
 
-            <div className="Debug-Bar">
+            {/* <div className="Debug-Bar">
                 <button onClick={() => fetchStatus()}>Get User Info</button>
                 <button onClick={() => fetchTeams()}>Refresh Teams</button>
                 <button onClick={signIn}>Sign in</button>
                 <button onClick={signOut}>Sign out</button>
                 <button onClick={openPopup}>Open Popup</button>
                 <button onClick={() => setSearch(true)}>Search</button>
-            </div>
+            </div> */}
         </div>
     );
 }

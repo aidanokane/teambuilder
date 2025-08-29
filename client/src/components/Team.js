@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onSaveTeam, onNewTeam, teams, setTeams }) => {
+const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onSaveTeam, onNewTeam, teams, setTeams, selectedGeneration, setSelectedGeneration }) => {
     const team = selectedTeam ? selectedTeam.pokemon_data : [];
     const fileInputRef = useRef(null);
 
@@ -224,7 +224,7 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                 try {
                     setError(null);
                     const name = pokemon.name.trim().toLowerCase();
-                    const res = await fetch(`http://localhost:3001/api/pokemon/${name}`, {
+                    const res = await fetch(`http://localhost:3001/api/pokemon/pokemon/${name}`, {
                         credentials: "include",
                         signal: ctrl.signal,
                     });
@@ -523,7 +523,8 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                 <div className="Team-Name-Section">
                     <input
                         type="text"
-                        value={selectedTeam?.name || 'Untitled'}
+                        defaultValue={selectedTeam?.name || 'Untitled'}
+                        value={selectedTeam?.name}
                         onChange={(e) => setTeam(prev => {
                             // Ensure prev is a valid team object
                             if (!prev || typeof prev !== 'object') {
@@ -574,6 +575,12 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                     />
                 </div>
             </div>
+            <select className="Generation-Select"
+                    value={selectedGeneration}
+                    onChange={(e) => setSelectedGeneration(e.target.value)}>{[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+                <option key={index} value={index+1}>Generation {index+1}</option>
+            ))}</select>
+            
             <div className="Team-Bar">
                 {[0, 1, 2, 3, 4, 5].map((index) => (
                     <button

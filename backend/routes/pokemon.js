@@ -16,7 +16,7 @@ router.get('/generations', async (req, res) => {
 
 router.get('/generation/:id', async (req, res) => {
     const generationId = req.params.id;
-    
+    console.log("GETTING POKEMON FOR GENERATION", generationId)
     try {
         const response = await fetch(`https://pokeapi.co/api/v2/generation/${generationId}`);
         if (!response.ok) {
@@ -77,7 +77,7 @@ router.get('/search/:query', async (req, res) => {
         res.status(500).json({ error: 'Failed to search Pokémon' });
     }
 });
-router.get('/:name', async (req, res) => {
+router.get('/pokemon/:name', async (req, res) => {
     const name = req.params.name.toLowerCase();
 
     try {
@@ -117,5 +117,70 @@ router.get('/:name', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch Pokémon' });
     }
 });
+
+router.get('/list', async (req, res) => {
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/type/`);
+
+        const data = await response.json();
+        console.log(data);
+        const types = data.results
+        res.json(types);
+    } catch (err) {
+        console.error('Error fetching Types List:', err);
+        res.status(500).json({ error: 'Failed to fetch Types List' });
+    }
+})
+
+router.get('/ability/:name', async (req, res) => {
+    const name = req.params.name.toLowerCase();
+
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/ability/${name}`);
+        
+        if (!response.ok) {
+            return res.status(404).json({ error: 'Ability not found' });
+        }
+        
+        const data = await response.json();
+        res.json(data);
+    }  catch (e) {
+        console.error(`Error fetching ability, ${name}:`, e);
+        res.status(500).json({error: 'Failed to fetch ability query'});
+    }
+});
+
+router.get('/abilities', async (req, res) => {
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/ability?limit=500&offset=0`);
+        
+        if (!response.ok) {
+            return res.sendStatus(response.status);
+        }
+        const data = await response.json();
+        res.json(data.results);
+    } catch (e) {
+        console.error("Error fetching ability query:", e);
+    }
+})
+
+router.get('/type/:index', async (req, res) => {
+    const index = req.params.index;    
+    console.log("GETTING TYPE");
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/type/${index}`);
+
+        if (!response.ok) {
+            return res.status(404).json({ error: 'Pokémon not found' });
+        }
+
+        const data = await response.json();
+        const pokemon = data.pokemon
+        res.json(pokemon);
+    } catch (err) {
+        console.error('Error fetching Pokémon:', err);
+        res.status(500).json({ error: 'Failed to fetch Pokémon' });
+    }
+})
 
 module.exports = router;
