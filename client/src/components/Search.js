@@ -3,8 +3,11 @@ import { addMember } from "../utils/teamUtils";
 
 const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesList }) => {
     const [query, setQuery] = useState("");
+    const [abilityQuery, setAbilityQuery] = useState("");
+    const [abilityList, setAbilityList] = useState([]);
+    const [filteredAbilities, setFilteredAbilities] = useState([]);
     const [generations, setGenerations] = useState([]);
-    const [pokemonList, setPokemonList] = useState([]);
+    const [pokemonQuery, setPokemonQuery] = useState([]);
     const [pokemonByGeneration, setPokemonByGeneration] = useState([])
     const [filteredPokemon, setFilteredPokemon] = useState([]);
     const [selectedPokemon, setSelectedPokemon] = useState(null);
@@ -14,6 +17,7 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
     const [filters, setFilters] = useState({
         "type1": [],
         "type2": [],
+        "ability": [],
         "generation": []
     });
 
@@ -25,14 +29,18 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
 
     useEffect(() => {
         if (query.trim() === '') {
-            setFilteredPokemon(pokemonByGeneration);
+            setPokemonQuery(filteredPokemon);
         } else {
             const filtered = filteredPokemon.filter(pokemon => 
                 pokemon.name.toLowerCase().includes(query.toLowerCase())
             );
-            setFilteredPokemon(filtered);
+            setPokemonQuery(filtered);
         }
-    }, [query, pokemonList]);
+    }, [query, filteredPokemon]);
+
+    useEffect(() => {
+        fetchAbilities();
+    }, []);
 
     const fetchPokemonByGeneration = async (generationId) => {
         const gen = parseInt(generationId);
@@ -56,8 +64,8 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
 
             const merged = payloads.flatMap(p => p.pokemon);
             setPokemonByGeneration(merged);
-            console.log("POKEMON UP TO GENERATION 2", merged);
             setFilteredPokemon(merged);
+            setPokemonQuery(merged);
             
         } catch (e) {
             console.error('Failed to fetch generation Pokémon:', e);
@@ -72,7 +80,7 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
         setError(null);
 
         try {
-            const res = await fetch(`http://localhost:3001/api/pokemon/${pokemonName}`, {
+            const res = await fetch(`http://localhost:3001/api/pokemon/pokemon/${pokemonName}`, {
                 credentials: "include",
             });
 
@@ -166,11 +174,77 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
         }
     }
 
+    const fetchPokemonByAbility = async(ability) => {
+        setError(null);
+        setLoading(true);
+
+        try{
+            const res = await fetch(`http://localhost:3001/api/pokemon/ability/${ability}`, {
+                credentials: "include"
+            });
+
+            if (res.status === 404) {
+                setError("Pokémon not found");
+                return;
+            }
+
+            if (!res.ok) {
+                setError(`HTTP ${res.status}`);
+                return;
+            }
+            const data = await res.json();
+            const newAbilityFilter = data.pokemon.map(p => p.pokemon);
+            const newFilters = {...filters, ability: newAbilityFilter}
+            setFilters(newFilters);
+            filterPokemon(newFilters);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchAbilities = async () => {
+        setLoading(true);
+        setError(null);
+        console.log("FETCHING ABILITIES");
+        try {
+            const res = await fetch('http://localhost:3001/api/pokemon/abilities', {
+                credentials: "include",
+            });
+
+            if (res.status === 404) {
+                setError("Abilities not found");
+                return;
+            }
+
+            if (!res.ok) {
+                setError(`HTTP ${res.status}`);
+                return;
+            }
+
+            const data = await res.json();
+            setAbilityList(data.map(ability => ability.name));
+        } catch (e) {
+            console.error("Error getting abilities:", e);
+            setError(e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const handleQueryChange = (e) => {
         setQuery(e.target.value);
         setSelectedPokemon(null);
         setError(null);
     };
+
+    const handleAbilityQueryChange = (value) => {
+        setAbilityQuery(value);
+        console.log(abilityList);
+        const abilities = abilityList.filter(ability => ability.includes(value));
+        setFilteredAbilities(abilities);
+    }
 
     function union(lists = []) {
         let active = [];
@@ -221,8 +295,6 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
         }
     };
 
-    console.log(selectedIndex);
-
     return (
         <div className="Modal-Overlay">
             <div className="Search-Popup">
@@ -265,6 +337,21 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                                 </div>
                             ))}
                             </div>
+                            <h3>Ability</h3>
+                            <input
+                                className="Ability-Input"
+                                value={abilityQuery}
+                                onChange={(e) => handleAbilityQueryChange(e.target.value)}
+                            />
+                            <div className="Ability-List">
+                                {filteredAbilities.map((ability, index) => (
+                                <button
+                                    key={index}
+                                    value={ability}
+                                    onClick={(e) => fetchPokemonByAbility(e.target.value)}
+                                >{ability}</button>
+                                ))}
+                            </div>
                             <h3>Generation</h3>
                             <select className="Generation-Select"
                                 defaultValue={0}
@@ -288,12 +375,12 @@ const Search = ({ setTeam, selectedIndex, setSearch, selectedGeneration, typesLi
                     </div>
                     <div className="Search-Middle">
                         <div className="Pokemon-Grid-Section">
-                            <h3>Pokémon ({filteredPokemon.length})</h3>
+                            <h3>Pokémon ({pokemonQuery.length})</h3>
                             {loading ? (
                                 <div className="Loading-Message">Loading...</div>
                             ) : (
                                 <div className="Pokemon-Grid">
-                                    {filteredPokemon.map((pokemon, index) => (
+                                    {pokemonQuery.map((pokemon, index) => (
                                         <button
                                             key={index}
                                             className="Pokemon-Grid-Item"
