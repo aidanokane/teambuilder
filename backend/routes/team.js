@@ -85,6 +85,17 @@ router.post('/save', isAuthenticated, async (req, res) => {
     }
 
     try {
+        // Check for duplicate team name for this user
+        const existingTeam = await pool.query(
+            'SELECT id FROM teams WHERE user_id = $1 AND LOWER(name) = LOWER($2)',
+            [req.user.id, name]
+        );
+
+        if (existingTeam.rows.length > 0) {
+            console.log('Duplicate team name found:', name);
+            return res.status(409).json({ error: 'Team name already exists. Please choose a different name.' });
+        }
+
         // Sanitize the pokemon data
         const sanitizedData = sanitizePokemonData(pokemon_data);
 
@@ -175,6 +186,17 @@ router.put('/:id', isAuthenticated, async (req, res) => {
     }
 
     try {
+        // Check for duplicate team name for this user (excluding current team)
+        const existingTeam = await pool.query(
+            'SELECT id FROM teams WHERE user_id = $1 AND LOWER(name) = LOWER($2) AND id != $3',
+            [req.user.id, name, teamId]
+        );
+
+        if (existingTeam.rows.length > 0) {
+            console.log('Duplicate team name found:', name);
+            return res.status(409).json({ error: 'Team name already exists. Please choose a different name.' });
+        }
+
         // Sanitize the pokemon data
         const sanitizedData = sanitizePokemonData(pokemon_data);
 

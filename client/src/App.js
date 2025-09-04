@@ -308,11 +308,30 @@ function App() {
                 <div className="navbar-left">
                     Welcome {user ? user.name : "Guest"}
                 </div>
-                {isTeamLoaded && loadedTeamName && (
-                    <div className="team-loaded-indicator">
-                        Team Loaded: {loadedTeamName}
-                    </div>
-                )}
+                <div className="navbar-right">
+                    {isTeamLoaded && loadedTeamName && (
+                        <div className="team-loaded-indicator">
+                            Team Loaded: {loadedTeamName}
+                        </div>
+                    )}
+                    {user ? (
+                        <button 
+                            className="auth-button logout-button" 
+                            onClick={signOut}
+                            title="Sign Out"
+                        >
+                            🚪 Sign Out
+                        </button>
+                    ) : (
+                        <button 
+                            className="auth-button login-button" 
+                            onClick={signIn}
+                            title="Sign In with Google"
+                        >
+                            🔐 Sign In
+                        </button>
+                    )}
+                </div>
             </div>
 
             {message && <Popup onSignIn={signIn} onSkip={closePopup} />}

@@ -86,12 +86,12 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
     };
 
     // CSV Import functionality
-    const importFromCSV = (event) => {
+    const importFromCSV = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const csv = e.target.result;
                 const lines = csv.split('\n');
@@ -158,14 +158,99 @@ const Team = ({ selectedTeam, setTeam, selectedMember, setMember, setSearch, onS
                     }
                 }
 
-                // Add imported teams to existing teams
+                // Process imported teams
                 const teamsArray = Object.values(importedTeams);
-                if (teamsArray.length > 0) {
-                    setTeams(prev => [...(Array.isArray(prev) ? prev : []), ...teamsArray]);
-                    alert(`Successfully imported ${teamsArray.length} team(s)!`);
-                    console.log('Imported teams:', teamsArray);
-                } else {
+                if (teamsArray.length === 0) {
                     alert('No valid team data found in CSV file.');
+                    return;
+                }
+
+                // Check for duplicate team names and handle them
+                const existingTeamNames = new Set(teams.map(t => t.name.toLowerCase()));
+                const teamsToImport = [];
+                const duplicateTeams = [];
+
+                for (const team of teamsArray) {
+                    const lowerName = team.name.toLowerCase();
+                    if (existingTeamNames.has(lowerName)) {
+                        duplicateTeams.push(team);
+                    } else {
+                        teamsToImport.push(team);
+                    }
+                }
+
+                // Handle duplicate team names
+                for (const duplicateTeam of duplicateTeams) {
+                    let newName = duplicateTeam.name;
+                    let counter = 1;
+                    let cancelled = false;
+                    
+                    // Keep asking for a new name until we get a unique one
+                    while (existingTeamNames.has(newName.toLowerCase()) || teamsToImport.some(t => t.name.toLowerCase() === newName.toLowerCase())) {
+                        newName = prompt(
+                            `Team name "${duplicateTeam.name}" already exists. Please enter a new name:`,
+                            `${duplicateTeam.name} (${counter})`
+                        );
+                        
+                        if (newName === null) {
+                            // User cancelled, skip this team
+                            cancelled = true;
+                            break;
+                        }
+                        
+                        // Trim whitespace and check if empty
+                        newName = newName.trim();
+                        if (newName === '') {
+                            alert('Team name cannot be empty. Please enter a valid name.');
+                            continue;
+                        }
+                        
+                        counter++;
+                    }
+                    
+                    if (!cancelled && newName) {
+                        teamsToImport.push({
+                            ...duplicateTeam,
+                            name: newName
+                        });
+                    }
+                }
+
+                if (teamsToImport.length === 0) {
+                    alert('No teams to import (all were duplicates and cancelled).');
+                    return;
+                }
+
+                // Save each team to the database
+                let successCount = 0;
+                let errorCount = 0;
+                const errors = [];
+
+                for (const team of teamsToImport) {
+                    try {
+                        console.log('Importing team:', team.name);
+                        const result = await onSaveTeam(team);
+                        
+                        if (result && result.success) {
+                            successCount++;
+                            console.log('Successfully imported team:', team.name);
+                        } else {
+                            errorCount++;
+                            errors.push(`${team.name}: ${result?.error || 'Unknown error'}`);
+                            console.error('Failed to import team:', team.name, result?.error);
+                        }
+                    } catch (error) {
+                        errorCount++;
+                        errors.push(`${team.name}: ${error.message}`);
+                        console.error('Error importing team:', team.name, error);
+                    }
+                }
+
+                // Show results
+                if (successCount > 0) {
+                    alert(`Successfully imported ${successCount} team(s)!${errorCount > 0 ? `\n\n${errorCount} team(s) failed to import:\n${errors.join('\n')}` : ''}`);
+                } else {
+                    alert(`Failed to import any teams:\n${errors.join('\n')}`);
                 }
 
             } catch (error) {

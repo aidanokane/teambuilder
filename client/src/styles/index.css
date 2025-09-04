@@ -63,6 +63,12 @@ body {
     text-align: left;
 }
 
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .team-loaded-indicator {
     background-color: var(--color-3);
     color: white;
@@ -71,6 +77,70 @@ body {
     font-size: 0.9rem;
     font-weight: normal;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.auth-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.login-button {
+    background-color: var(--color-4);
+    color: white;
+    border: 2px solid var(--color-4);
+}
+
+.login-button:hover {
+    background-color: var(--color-3);
+    border-color: var(--color-3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    color: white;
+    border: 2px solid #e74c3c;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive design for auth buttons */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 15px;
+        font-size: 1rem;
+    }
+    
+    .navbar-right {
+        gap: 10px;
+    }
+    
+    .auth-button {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        min-width: 70px;
+    }
+    
+    .team-loaded-indicator {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
 }
 
 .main-content {
